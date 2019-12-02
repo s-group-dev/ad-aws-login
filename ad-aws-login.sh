@@ -57,7 +57,7 @@ if [ -z $APP_NAME ]; then
 fi
 
 THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
-EXTENSION=$THIS_DIR/chrome_extension
+EXTENSION="$THIS_DIR/chrome_extension"
 
 TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
 TEMP_FILENAME=temporary_aws_credentials${TIMESTAMP}.txt
@@ -66,12 +66,12 @@ rm -f $TEMP_FILE
 
 # if chrome is already open, we would get just new tab without our extensions,
 # unless we use custom --user-data-dir
-USER_DATA_DIR=$THIS_DIR/user_data
-mkdir -p $USER_DATA_DIR
+USER_DATA_DIR="$THIS_DIR/user_data"
+mkdir -p "$USER_DATA_DIR"
 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-    --load-extension=$EXTENSION --disable-extensions-except=$EXTENSION \
-    --user-data-dir=$USER_DATA_DIR \
+    --load-extension="$EXTENSION" --disable-extensions-except="$EXTENSION" \
+    --user-data-dir="$USER_DATA_DIR" \
     'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$TEMP_FILENAME'&roleArn='$ROLE_ARN 2>/dev/null &
 
 PID=$!
