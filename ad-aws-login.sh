@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -e
-set -u
+set -euo pipefail
 
 PROFILE_NAME=
 APP_NAME=
@@ -16,7 +15,7 @@ function usage() {
     echo "        Case-insensitive. Must be url encoded (replace spaces with %20)."
     echo "  --duration-hours How long the temporary credentials are valid"
     echo "  --role-arn AWS IAM Role to assume with AD credentials"
-    exit 1
+    exit 128
 }
 
 
