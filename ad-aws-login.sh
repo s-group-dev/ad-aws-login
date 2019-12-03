@@ -52,6 +52,18 @@ if [ -z $PROFILE_NAME ]; then
     usage
 fi
 
+# Check that AWS config and selected profile exists.
+AWS_CONFIG="${HOME}/.aws/config"
+if [ ! -f "${AWS_CONFIG}" ]; then
+    echo "AWS config file (${AWS_CONFIG}) does not exist. Cannot continue."
+    exit 1
+fi
+
+if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
+    echo "Profile ${PROFILE_NAME} not found."
+    exit 2
+fi
+
 if [ -z $APP_NAME ]; then
     echo "--app-name not specified. Now you must select app manually."
 fi
