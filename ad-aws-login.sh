@@ -80,6 +80,7 @@ rm -f $TEMP_FILE
 # unless we use custom --user-data-dir
 USER_DATA_DIR="$THIS_DIR/user_data"
 mkdir -p "$USER_DATA_DIR"
+trap "rm -f ${TEMP_FILE}" EXIT
 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
     --load-extension="$EXTENSION" --disable-extensions-except="$EXTENSION" \
@@ -102,10 +103,10 @@ if [ -e $TARGET_FILE ]; then
   # delete section with old values, if any
   awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $TARGET_FILE.bak > ${TARGET_FILE}
 fi
+
 # add new values
-echo "\n[$PROFILE_NAME]" >> ${TARGET_FILE}
+echo -e "\n[$PROFILE_NAME]" >> ${TARGET_FILE}
 cat $TEMP_FILE >> ${TARGET_FILE}
-rm $TEMP_FILE
 
 echo "Updated profile $PROFILE_NAME."
 tail -1 ${TARGET_FILE}
