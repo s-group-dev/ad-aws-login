@@ -1,21 +1,16 @@
 {
+  // Required
   "manifest_version": 2,
   "name": "AWS AD credentials fetcher",
   "version": "1.0",
-  "permissions": [
-    "webRequest",
-    "*://*/*",
-    "webRequestBlocking",
-    "downloads",
-    "tabs",
-    "contentSettings"
-  ],
+
+  // Optional
   "background": {
-    "persistent": true,
     "scripts": [
       "background.js",
       "aws-sdk-2.503.min.js"
-    ]
+    ],
+    "persistent": true
   },
   "content_scripts": [
     {
@@ -26,5 +21,13 @@
       "matches": ["https://account.activedirectory.windowsazure.com/*"],
       "js": ["select_app.js"]
     }
+  ],
+  "permissions": [
+    "*://*/*",
+    "contentSettings",
+    "downloads",
+    "tabs",
+    "webRequest",
+    "webRequestBlocking"
   ]
 }
