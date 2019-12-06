@@ -55,13 +55,11 @@ aws_session_expiration=${credentials.Expiration.toJSON()}
 
         const SAMLResponse = details.requestBody.formData.SAMLResponse[0]
         var re = null;
+        var arn = null;
         if (parameters.roleArn) {
             re = new RegExp("\<Attribute Name\=\"https\:\/\/aws\.amazon\.com\/SAML\/Attributes\/Role\"\>.*\<AttributeValue\>" + parameters.roleArn + ",([^<]+)\<\/AttributeValue\>.*\<\/Attribute\>");
-        } else {
-            //assume one role in SAML
-            re = new RegExp("\<Attribute Name\=\"https\:\/\/aws\.amazon\.com\/SAML\/Attributes\/Role\"\>\<AttributeValue\>([^,]+),([^<]+)\<\/AttributeValue\>\<\/Attribute\>");
+            arn = atob(SAMLResponse).match(re);
         }
-        const arn = atob(SAMLResponse).match(re);
         if (!arn) {
             console.error("Could not parse role / principal from SAML");
         }
