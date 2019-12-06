@@ -20,6 +20,10 @@
     {
       "matches": ["https://account.activedirectory.windowsazure.com/*"],
       "js": ["select_app.js"]
+    },
+    {
+      "matches": ["https://signin.aws.amazon.com/saml"],
+      "js": ["select_role.js"]
     }
   ],
   "permissions": [

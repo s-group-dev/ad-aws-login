@@ -29,14 +29,18 @@ aws_session_expiration=${credentials.Expiration.toJSON()}
         })
     }
 
-    chrome.runtime.onMessage.addListener(
-        function(request, sender, sendResponse) {
-            if (request.type === 'AWS_AD_credentials_fetcher_get_parameter') {
-                sendResponse(parameters[request.key])
-            }
-            return true;
+    chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
+        if (request.type === 'AWS_AD_credentials_fetcher_get_parameter') {
+            sendResponse(parameters[request.key])
         }
-    );
+        if (request.type === "AWS_AD_credentials_get_role") {
+            sendResponse(parameters[request.key])
+        }
+        if (request.type === 'AWS_AD_Credentials_set_role') {
+            parameters.roleArn = request.roleArn;
+        }
+        return true;
+    });
 
     function onBeforeRequestListener(details) {
         if (details.url.startsWith('http://localhost/')) {
@@ -82,7 +86,7 @@ aws_session_expiration=${credentials.Expiration.toJSON()}
                 saveCredentials(data.Credentials);
             }
         });
-
+        
         // prevent going to aws
         return {redirectUrl: 'javascript:void(0)'}
     }
