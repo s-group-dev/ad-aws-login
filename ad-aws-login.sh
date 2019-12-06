@@ -80,7 +80,6 @@ rm -f $TEMP_FILE
 # unless we use custom --user-data-dir
 USER_DATA_DIR="$THIS_DIR/user_data"
 mkdir -p "$USER_DATA_DIR"
-trap "rm -f ${TEMP_FILE}" EXIT
 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
     --load-extension="$EXTENSION" --disable-extensions-except="$EXTENSION" \
@@ -88,14 +87,13 @@ trap "rm -f ${TEMP_FILE}" EXIT
     'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$TEMP_FILENAME'&roleArn='$ROLE_ARN 2>/dev/null &
 
 PID=$!
+echo $PID
 
 while [ ! -f $TEMP_FILE ]
 do
   sleep 1
 done
 
-# kill this chrome
-kill $PID
 
 TARGET_FILE=~/.aws/credentials
 if [ -e $TARGET_FILE ]; then
@@ -110,3 +108,11 @@ cat $TEMP_FILE >> ${TARGET_FILE}
 
 echo "Updated profile $PROFILE_NAME."
 tail -1 ${TARGET_FILE}
+
+trap cleanup EXIT
+function cleanup() {
+    # remove downmloaded tempfile
+    rm -f ${TEMP_FILE}
+    # kill this chrome
+    kill $(ps ax | grep 'Chrome.app' | grep 'filename=temporary_aws_credentials' | awk '{ print $1; }')
+}
