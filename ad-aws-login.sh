@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -d|--duration-hours)
+        -d|--duration)
             DURATION_HOURS=$2
             shift
             shift
