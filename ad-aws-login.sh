@@ -1,5 +1,4 @@
-#!/usr/bin/env bash
-
+#!/usr/bin/env bash 
 set -euo pipefail
 
 PROFILE_NAME=
@@ -8,16 +7,21 @@ DURATION_HOURS=4
 ROLE_ARN=
 
 function usage() {
-    echo "Usage: ad-aws-login.sh --profile <profile name> --app <app name>"
-    echo "Options:"
-    echo "  --profile  The name of the profile in ~/.aws/credentials to update"
-    echo "  --app A substring of the app name shown in myapps.microsoft.com to launch."
-    echo "        Case-insensitive. Must be url encoded (replace spaces with %20)."
-    echo "  --duration-hours How long the temporary credentials are valid"
-    echo "  --role-arn AWS IAM Role to assume with AD credentials"
+    cat <<EOF
+Usage: ${0} [OPTIONS]
+
+  Simple script that fetches temporary AWS credentials with Azude AD login
+  (https://myapps.microsoft.com).
+
+Options:
+  --profile  TEXT    The name of the profile in ~/.aws/credentials to update.
+  --app      TEXT    A substring of the app name shown in myapps.microsoft.com
+                     to launch. Case-insensitive. Must be url encoded.
+  --duration INTEGER How many hours the temporary credentials are valid.
+  --role-arn TEXT    AWS IAM Role to assume with AD credentials.
+EOF
     exit 128
 }
-
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -48,7 +52,6 @@ while [[ $# -gt 0 ]]; do
 done
 
 if [ -z $PROFILE_NAME ]; then
-    echo "Must specify profile name."
     usage
 fi
 
@@ -60,7 +63,7 @@ if [ ! -f "${AWS_CONFIG}" ]; then
 fi
 
 if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
-    echo "Profile ${PROFILE_NAME} not found."
+    echo "Profile ${PROFILE_NAME} not found in ${AWS_CONFIG}."
     exit 2
 fi
 
@@ -86,11 +89,7 @@ mkdir -p "$USER_DATA_DIR"
     --user-data-dir="$USER_DATA_DIR" \
     'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$TEMP_FILENAME'&roleArn='$ROLE_ARN 2>/dev/null &
 
-PID=$!
-echo $PID
-
-while [ ! -f $TEMP_FILE ]
-do
+while [ ! -f $TEMP_FILE ]; do
   sleep 1
 done
 
