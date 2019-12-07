@@ -1,10 +1,20 @@
 #!/usr/bin/env bash 
+
 set -euo pipefail
 
 PROFILE_NAME=
 APP_NAME=
 DURATION_HOURS=4
 ROLE_ARN=
+
+readonly AWS_CONFIG="${HOME}/.aws/config"
+readonly AWS_CREDENTIALS=~/.aws/credentials
+readonly THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
+readonly EXTENSION="$THIS_DIR/chrome_extension"
+readonly USER_DATA_DIR="$THIS_DIR/user_data"
+readonly TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
+readonly TEMP_FILENAME=temporary_aws_credentials${TIMESTAMP}.txt
+readonly TEMP_FILE=~/Downloads/$TEMP_FILENAME
 
 function usage() {
     cat <<EOF
@@ -56,7 +66,6 @@ if [ -z $PROFILE_NAME ]; then
 fi
 
 # Check that AWS config and selected profile exists.
-AWS_CONFIG="${HOME}/.aws/config"
 if [ ! -f "${AWS_CONFIG}" ]; then
     echo "AWS config file (${AWS_CONFIG}) does not exist. Cannot continue."
     exit 1
@@ -67,21 +76,10 @@ if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
     exit 2
 fi
 
-if [ -z $APP_NAME ]; then
-    echo "--app-name not specified. Now you must select app manually."
-fi
-
-THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
-EXTENSION="$THIS_DIR/chrome_extension"
-
-TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
-TEMP_FILENAME=temporary_aws_credentials${TIMESTAMP}.txt
-TEMP_FILE=~/Downloads/$TEMP_FILENAME
 rm -f $TEMP_FILE
 
 # if chrome is already open, we would get just new tab without our extensions,
 # unless we use custom --user-data-dir
-USER_DATA_DIR="$THIS_DIR/user_data"
 mkdir -p "$USER_DATA_DIR"
 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
@@ -94,19 +92,18 @@ while [ ! -f $TEMP_FILE ]; do
 done
 
 
-TARGET_FILE=~/.aws/credentials
-if [ -e $TARGET_FILE ]; then
-  cp $TARGET_FILE $TARGET_FILE.bak
+if [ -e $AWS_CREDENTIALS ]; then
+  cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
   # delete section with old values, if any
-  awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $TARGET_FILE.bak > ${TARGET_FILE}
+  awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $AWS_CREDENTIALS.bak > ${AWS_CREDENTIALS}
 fi
 
 # add new values
-echo -e "\n[$PROFILE_NAME]" >> ${TARGET_FILE}
-cat $TEMP_FILE >> ${TARGET_FILE}
+echo -e "\n[$PROFILE_NAME]" >> ${AWS_CREDENTIALS}
+cat $TEMP_FILE >> ${AWS_CREDENTIALS}
 
 echo "Updated profile $PROFILE_NAME."
-tail -1 ${TARGET_FILE}
+tail -1 ${AWS_CREDENTIALS}
 
 trap cleanup EXIT
 function cleanup() {
