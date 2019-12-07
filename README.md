@@ -33,12 +33,31 @@ source_profile=<the profile name in ~/.aws/crendentials you log in to>
 role_arn=<arn for the role to assume>
 ```
 
+## Usage
+
+Option `--profile` is mandatory.
+
+```
+Usage: ${0} [OPTIONS]
+
+  Simple script that fetches temporary AWS credentials with Azude AD login
+  (https://myapps.microsoft.com).
+
+Options:
+  --profile  TEXT    The name of the profile in ~/.aws/credentials to update.
+  --app      TEXT    A substring of the app name shown in myapps.microsoft.com
+                     to launch. Case-insensitive. Must be url encoded.
+  --duration INTEGER How many hours the temporary credentials are valid.
+  --role-arn TEXT    AWS IAM Role to assume with AD credentials.
+```
+
 ## Example
 
 Log in to your sandbox account. Assuming the link to the sandbox account in
 myapps.microsoft.com is called "AWS test", then `--app` argument should be
-"AWS%20test". Write temporary credentials to `~/.aws/credentials` under a
-profile called `sandbox`:
+"AWS%20test". If `--app` or `--role` is missing from parameters, you are asked
+to select them in browser. Write temporary credentials to `~/.aws/credentials`
+under a profile called `sandbox`:
 
 ```
 ./ad-aws-login.sh --profile sandbox --app "AWS%20test" --duration-hours 4 --role-arn arn:aws:iam::123456789012:role/Developer
