@@ -12,9 +12,7 @@ readonly AWS_CREDENTIALS=~/.aws/credentials
 readonly THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
 readonly EXTENSION="$THIS_DIR/chrome_extension"
 readonly USER_DATA_DIR="$THIS_DIR/user_data"
-readonly TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
-readonly TEMP_FILENAME=temporary_aws_credentials${TIMESTAMP}.txt
-readonly TEMP_FILE=~/Downloads/$TEMP_FILENAME
+readonly TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
 function usage() {
     cat <<EOF
@@ -85,7 +83,7 @@ mkdir -p "$USER_DATA_DIR"
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
     --load-extension="$EXTENSION" --disable-extensions-except="$EXTENSION" \
     --user-data-dir="$USER_DATA_DIR" \
-    'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$TEMP_FILENAME'&roleArn='$ROLE_ARN 2>/dev/null &
+    'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$(basename ${TEMP_FILE})'&roleArn='$ROLE_ARN 2>/dev/null &
 
 while [ ! -f $TEMP_FILE ]; do
   sleep 1
