@@ -1,4 +1,4 @@
-#!/usr/bin/env bash 
+#!/usr/bin/env bash
 
 set -euo pipefail
 
@@ -29,6 +29,10 @@ Options:
   --role-arn TEXT    AWS IAM Role to assume with AD credentials.
 EOF
     exit 128
+}
+
+function err() {
+    echo "$@" >&2
 }
 
 while [[ $# -gt 0 ]]; do
@@ -65,12 +69,12 @@ fi
 
 # Check that AWS config and selected profile exists.
 if [ ! -f "${AWS_CONFIG}" ]; then
-    echo "AWS config file (${AWS_CONFIG}) does not exist. Cannot continue."
+    err "AWS config file (${AWS_CONFIG}) does not exist. Cannot continue."
     exit 1
 fi
 
 if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
-    echo "Profile ${PROFILE_NAME} not found in ${AWS_CONFIG}."
+    err "Profile ${PROFILE_NAME} not found in ${AWS_CONFIG}."
     exit 2
 fi
 
