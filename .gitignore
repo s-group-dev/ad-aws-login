@@ -1,1 +1,5 @@
 user_data
+
+# editor: vim
+*.swo
+*.swp

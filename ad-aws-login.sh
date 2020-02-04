@@ -1,7 +1,6 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-set -e
-set -u
+set -euo pipefail
 
 PROFILE_NAME=
 APP_NAME=
@@ -48,9 +47,22 @@ while [[ $# -gt 0 ]]; do
     esac
 done
 
-if [ -z $PROFILE_NAME ]; then
-    echo "Must specify profile name."
-    usage
+function selaws() {
+    local config="${HOME}/.aws/config"
+    test ! -f ${config} && echo "File ${config} does not exist" && exit 1
+    select _profile in $(cat "${config}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
+        echo $_profile
+        break
+    done
+}
+
+if [[ -z $PROFILE_NAME ]]; then
+    echo "No AWS profile given, select manually:"
+    PROFILE_NAME=$(selaws)
+    if [[ -z "${PROFILE_NAME}" ]]; then
+        echo "Must specify profile name."
+        usage
+    fi
 fi
 
 if [ -z $APP_NAME ]; then
