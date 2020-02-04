@@ -7,17 +7,33 @@ APP_NAME=
 DURATION_HOURS=4
 ROLE_ARN=
 
+readonly AWS_CONFIG="${HOME}/.aws/config"
+readonly AWS_CREDENTIALS=~/.aws/credentials
+readonly THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
+readonly EXTENSION="$THIS_DIR/chrome_extension"
+readonly USER_DATA_DIR="$THIS_DIR/user_data"
+readonly TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
+
 function usage() {
-    echo "Usage: ad-aws-login.sh --profile <profile name> --app <app name>"
-    echo "Options:"
-    echo "  --profile  The name of the profile in ~/.aws/credentials to update"
-    echo "  --app A substring of the app name shown in myapps.microsoft.com to launch."
-    echo "        Case-insensitive. Must be url encoded (replace spaces with %20)."
-    echo "  --duration-hours How long the temporary credentials are valid"
-    echo "  --role-arn AWS IAM Role to assume with AD credentials"
-    exit 1
+    cat <<EOF
+Usage: ${0} [OPTIONS]
+
+  Simple script that fetches temporary AWS credentials with Azude AD login
+  (https://myapps.microsoft.com).
+
+Options:
+  --profile  TEXT    The name of the profile in ~/.aws/credentials to update.
+  --app      TEXT    A substring of the app name shown in myapps.microsoft.com
+                     to launch. Case-insensitive. Must be url encoded.
+  --duration INTEGER How many hours the temporary credentials are valid.
+  --role-arn TEXT    AWS IAM Role to assume with AD credentials.
+EOF
+    exit 128
 }
 
+function err() {
+    echo "$@" >&2
+}
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -31,7 +47,7 @@ while [[ $# -gt 0 ]]; do
             shift
             shift
             ;;
-        -d|--duration-hours)
+        -d|--duration)
             DURATION_HOURS=$2
             shift
             shift
@@ -65,48 +81,50 @@ if [[ -z $PROFILE_NAME ]]; then
     fi
 fi
 
-if [ -z $APP_NAME ]; then
-    echo "--app-name not specified. Now you must select app manually."
+# Check that AWS config and selected profile exists.
+if [ ! -f "${AWS_CONFIG}" ]; then
+    err "AWS config file (${AWS_CONFIG}) does not exist. Cannot continue."
+    exit 1
 fi
 
-THIS_DIR="$( cd "$( dirname "$0" )" && pwd )"
-EXTENSION=$THIS_DIR/chrome_extension
+if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
+    err "Profile ${PROFILE_NAME} not found in ${AWS_CONFIG}."
+    exit 2
+fi
 
-TIMESTAMP="$(date +"%Y-%m-%d_%H-%M-%S")"
-TEMP_FILENAME=temporary_aws_credentials${TIMESTAMP}.txt
-TEMP_FILE=~/Downloads/$TEMP_FILENAME
 rm -f $TEMP_FILE
 
 # if chrome is already open, we would get just new tab without our extensions,
 # unless we use custom --user-data-dir
-USER_DATA_DIR=$THIS_DIR/user_data
-mkdir -p $USER_DATA_DIR
+mkdir -p "$USER_DATA_DIR"
 
 /Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-    --load-extension=$EXTENSION --disable-extensions-except=$EXTENSION \
-    --user-data-dir=$USER_DATA_DIR \
-    'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$TEMP_FILENAME'&roleArn='$ROLE_ARN 2>/dev/null &
+    --load-extension="$EXTENSION" --disable-extensions-except="$EXTENSION" \
+    --user-data-dir="$USER_DATA_DIR" \
+    'http://localhost/?durationHours='$DURATION_HOURS'&app='$APP_NAME'&filename='$(basename ${TEMP_FILE})'&roleArn='$ROLE_ARN 2>/dev/null &
 
-PID=$!
-
-while [ ! -f $TEMP_FILE ]
-do
+while [ ! -f $TEMP_FILE ]; do
   sleep 1
 done
 
-# kill this chrome
-kill $PID
 
-TARGET_FILE=~/.aws/credentials
-if [ -e $TARGET_FILE ]; then
-  cp $TARGET_FILE $TARGET_FILE.bak
+if [ -e $AWS_CREDENTIALS ]; then
+  cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
   # delete section with old values, if any
-  awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $TARGET_FILE.bak > ${TARGET_FILE}
+  awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $AWS_CREDENTIALS.bak > ${AWS_CREDENTIALS}
 fi
+
 # add new values
-echo "\n[$PROFILE_NAME]" >> ${TARGET_FILE}
-cat $TEMP_FILE >> ${TARGET_FILE}
-rm $TEMP_FILE
+echo -e "\n[$PROFILE_NAME]" >> ${AWS_CREDENTIALS}
+cat $TEMP_FILE >> ${AWS_CREDENTIALS}
 
 echo "Updated profile $PROFILE_NAME."
-tail -1 ${TARGET_FILE}
+tail -1 ${AWS_CREDENTIALS}
+
+trap cleanup EXIT
+function cleanup() {
+    # remove downmloaded tempfile
+    rm -f ${TEMP_FILE}
+    # kill this chrome
+    kill $(ps ax | grep 'Chrome.app' | grep 'filename=temporary_aws_credentials' | awk '{ print $1; }')
+}
