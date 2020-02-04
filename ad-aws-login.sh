@@ -64,22 +64,11 @@ while [[ $# -gt 0 ]]; do
 done
 
 function selaws() {
-    local config="${HOME}/.aws/config"
-    test ! -f ${config} && echo "File ${config} does not exist" && exit 1
-    select _profile in $(cat "${config}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
+    select _profile in $(cat "${AWS_CONFIG}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
         echo $_profile
         break
     done
 }
-
-if [[ -z $PROFILE_NAME ]]; then
-    echo "No AWS profile given, select manually:"
-    PROFILE_NAME=$(selaws)
-    if [[ -z "${PROFILE_NAME}" ]]; then
-        echo "Must specify profile name."
-        usage
-    fi
-fi
 
 # Check that AWS config and selected profile exists.
 if [ ! -f "${AWS_CONFIG}" ]; then
@@ -87,10 +76,16 @@ if [ ! -f "${AWS_CONFIG}" ]; then
     exit 1
 fi
 
+if [[ -z $PROFILE_NAME ]]; then
+    echo "No AWS profile given, select manually:"
+    PROFILE_NAME=$(selaws)
+fi
+
 if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
     err "Profile ${PROFILE_NAME} not found in ${AWS_CONFIG}."
     exit 2
 fi
+
 
 rm -f $TEMP_FILE
 
