@@ -89,11 +89,11 @@ fi
 PROFILE_CONFIG=$(sed -n "/${PROFILE_NAME}/,/^ *$/p" ${AWS_CONFIG})
 
 if [[ -z $APP_NAME ]]; then
-    APP_NAME=$(echo ${PROFILE_CONFIG} |  sed 's/ *= */=/g' | tr ' ' '\n' | grep 'app=' | sed 's/^.*=//')
+    APP_NAME=$(echo ${PROFILE_CONFIG} | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
 fi
 
 if [[ -z $ROLE_ARN ]]; then
-    ROLE_ARN=$(echo ${PROFILE_CONFIG} |  sed 's/ *= */=/g' | tr ' ' '\n' | grep 'role_arn=' | sed 's/^.*=//')
+    ROLE_ARN=$(echo ${PROFILE_CONFIG} | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
 rm -f $TEMP_FILE
