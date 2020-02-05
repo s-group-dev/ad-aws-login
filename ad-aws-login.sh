@@ -93,7 +93,7 @@ if [[ -z $APP_NAME ]]; then
 fi
 
 if [[ -z $ROLE_ARN ]]; then
-    ROLE_ARN=$(echo ${PROFILE_CONFIG} | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
+    ROLE_ARN=$(echo ${PROFILE_CONFIG} |  (grep 'role_arn*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
 rm -f $TEMP_FILE
@@ -125,7 +125,7 @@ cat << EOL >> ${AWS_CREDENTIALS}
 [$PROFILE_NAME]
 EOL
 
-cat $TEMP_FILE >> ${AWS_CREDENTIALS}
+cat $TEMP_FILE >> "${AWS_CREDENTIALS}"
 
 echo "Updated profile $PROFILE_NAME."
 tail -1 ${AWS_CREDENTIALS}
