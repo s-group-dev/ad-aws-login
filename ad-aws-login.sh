@@ -120,7 +120,7 @@ fi
 
 
 # add new values
-cat << EOL >> ${AWS_CREDENTIALS}
+cat << EOL >> "${AWS_CREDENTIALS}"
 
 [$PROFILE_NAME]
 EOL
