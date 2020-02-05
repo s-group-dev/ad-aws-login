@@ -86,6 +86,15 @@ if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
     exit 2
 fi
 
+PROFILE_CONFIG=$(sed -n "/${PROFILE_NAME}/,/^ *$/p" ${AWS_CONFIG})
+
+if [[ -z $APP_NAME ]]; then
+    APP_NAME=$(echo ${PROFILE_CONFIG} |  sed 's/ *= */=/g' | tr ' ' '\n' | grep 'app=' | sed 's/^.*=//')
+fi
+
+if [[ -z $ROLE_ARN ]]; then
+    ROLE_ARN=$(echo ${PROFILE_CONFIG} |  sed 's/ *= */=/g' | tr ' ' '\n' | grep 'role_arn=' | sed 's/^.*=//')
+fi
 
 rm -f $TEMP_FILE
 

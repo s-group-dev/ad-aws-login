@@ -29,8 +29,9 @@ for each role you're going to use. Something like this:
 ```
 [profile <profile name for role to assume>]
 region=<your region>
-source_profile=<the profile name in ~/.aws/crendentials you log in to>
+source_profile=<the profile name in ~/.aws/credentials you log in to>
 role_arn=<arn for the role to assume>
+app=A substring of the app name shown in myapps.microsoft.com to launch. Case-insensitive. Must be url encoded.
 ```
 
 ## Usage
@@ -55,7 +56,7 @@ Options:
 
 Log in to your sandbox account. Assuming the link to the sandbox account in
 myapps.microsoft.com is called "AWS test", then `--app` argument should be
-"AWS%20test". If `--app` or `--role` is missing from parameters, you are asked
+"AWS%20test". If `--app` or `--role-arn` is missing from parameters, you are asked
 to select them in browser. Write temporary credentials to `~/.aws/credentials`
 under a profile called `sandbox`:
 
@@ -65,6 +66,17 @@ under a profile called `sandbox`:
 unset AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
 # Set active profile to andbox
 export AWS_PROFILE=sandbox
+```
+
+You can also configure your profile in `.aws/config`. Do note that profiles should be separated with a newline
+```
+[profile test-admin]
+region=eu-west-1
+app=AWS%20test
+role_arn=arn:aws:iam::123456789012:role/Developer
+
+[profile another-profile]
+...
 ```
 
 **Note** Your account probably has some maximum session duration. Trying to
