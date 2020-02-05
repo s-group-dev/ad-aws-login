@@ -86,7 +86,7 @@ if ! cat "${AWS_CONFIG}" | grep -q "^\[profile ${PROFILE_NAME}\]$"; then
     exit 2
 fi
 
-PROFILE_CONFIG=$(sed -n "/${PROFILE_NAME}/,/^ *$/p" ${AWS_CONFIG})
+PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" ${AWS_CONFIG})"
 
 if [[ -z $APP_NAME ]]; then
     APP_NAME=$(echo ${PROFILE_CONFIG} | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
@@ -118,8 +118,13 @@ if [ -e $AWS_CREDENTIALS ]; then
   awk '/^\[/{keep=1} /^\['$PROFILE_NAME'\]/{keep=0} {if (keep) {print $0}}' $AWS_CREDENTIALS.bak > ${AWS_CREDENTIALS}
 fi
 
+
 # add new values
-echo -e "\n[$PROFILE_NAME]" >> ${AWS_CREDENTIALS}
+cat << EOL >> ${AWS_CREDENTIALS}
+
+[$PROFILE_NAME]
+EOL
+
 cat $TEMP_FILE >> ${AWS_CREDENTIALS}
 
 echo "Updated profile $PROFILE_NAME."
