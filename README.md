@@ -57,7 +57,7 @@ Options:
 Log in to your sandbox account. Assuming the link to the sandbox account in
 myapps.microsoft.com is called "AWS test", then `--app` argument should be
 "AWS%20test". If `--app` or `--role-arn` is missing from parameters, you are asked
-to select them in browser. Write temporary credentials to `~/.aws/credentials`
+to select them in browser. Can be written in the `.aws/config` file aswell. `Write temporary credentials to `~/.aws/credentials`
 under a profile called `sandbox`:
 
 ```
