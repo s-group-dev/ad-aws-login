@@ -67,7 +67,7 @@ until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
 printf "\n"
 
 awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' ${AWS_CREDENTIALS}.bak > ${AWS_CREDENTIALS}
-echo -e "\n[${PROFILE_NAME}]" >> ${AWS_CREDENTIALS}
+printf "\n[${PROFILE_NAME}]" >> ${AWS_CREDENTIALS}
 cat "${TEMP_FILE}" >> "${AWS_CREDENTIALS}"
 echo "Updated profile ${PROFILE_NAME}."
 tail -1 ${AWS_CREDENTIALS}
