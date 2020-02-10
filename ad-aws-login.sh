@@ -62,12 +62,18 @@ fi
     --user-data-dir="${PWD}/user_data" \
     "http://localhost/?durationHours=${DURATION_HOURS}&app=${APP_NAME}&filename=$(basename "${TEMP_FILE}")&roleArn=${ROLE_ARN}" 2>/dev/null &
 
+PID=$!
+
 until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
+
+# kill this chrome
+kill $PID
 
 printf "\n"
 
+cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
 awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' ${AWS_CREDENTIALS}.bak > ${AWS_CREDENTIALS}
-printf "\n[${PROFILE_NAME}]" >> ${AWS_CREDENTIALS}
+printf "\n[${PROFILE_NAME}]\n" >> ${AWS_CREDENTIALS}
 cat "${TEMP_FILE}" >> "${AWS_CREDENTIALS}"
 echo "Updated profile ${PROFILE_NAME}."
 tail -1 ${AWS_CREDENTIALS}
