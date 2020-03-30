@@ -36,7 +36,7 @@ readonly AWS_CONFIG="${HOME}/.aws/config"
 
 PROFILE_NAME="$(argv profile "" "${*:-}")"
 APP_NAME="$(argv app "" "${*:-}")"
-DURATION_HOURS="$(argv duration 4 "${*:-}")"
+DURATION_HOURS="$(argv duration 8 "${*:-}")"
 ROLE_ARN="$(argv role-arn "" "${*:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
