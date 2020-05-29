@@ -36,7 +36,7 @@ readonly AWS_CONFIG="${HOME}/.aws/config"
 
 PROFILE_NAME="$(argv profile "" "${*:-}")"
 APP_NAME="$(argv app "" "${*:-}")"
-DURATION_HOURS="$(argv duration 4 "${*:-}")"
+DURATION_HOURS="$(argv duration 8 "${*:-}")"
 ROLE_ARN="$(argv role-arn "" "${*:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
@@ -57,7 +57,8 @@ if [[ -z $ROLE_ARN ]]; then
     ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
-/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+#/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
+/Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
     --load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" \
     --user-data-dir="${PWD}/user_data" \
     "http://localhost/?durationHours=${DURATION_HOURS}&app=${APP_NAME}&filename=$(basename "${TEMP_FILE}")&roleArn=${ROLE_ARN}" 2>/dev/null &
