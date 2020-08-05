@@ -72,6 +72,10 @@ kill $PID
 
 printf "\n"
 
+if [[ ! -f $AWS_CREDENTIALS ]]; then
+    touch $AWS_CREDENTIALS
+fi
+
 cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
 awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' ${AWS_CREDENTIALS}.bak > ${AWS_CREDENTIALS}
 printf "\n[${PROFILE_NAME}]\n" >> ${AWS_CREDENTIALS}
