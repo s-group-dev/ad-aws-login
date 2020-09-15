@@ -84,6 +84,11 @@ use longer `--duration-hours` will cause the script to get stuck.
 
 **Pro tip:** Put this in a bash alias or script.
 
+## Useful commands
+
+If you have [fzf](https://github.com/junegunn/fzf) installed, it
+will be beneficial.
+
 ## TODO
 
 * Downloading the credentials from chrome as a file is not that neat. Is there
