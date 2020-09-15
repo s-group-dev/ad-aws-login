@@ -1,7 +1,9 @@
 #!/usr/bin/env bash
 
 set -euo pipefail
+
 cd "$(dirname "$0")"
+
 function usage() {
     cat <<EOF
 Usage: ${0} [OPTIONS]
@@ -16,6 +18,7 @@ Options:
 EOF
     exit 128
 }
+
 trap cleanup EXIT
 function cleanup() {
     (
@@ -23,13 +26,32 @@ function cleanup() {
         kill "$(pgrep -lf 'Chrome.app' | grep 'temporary_aws_credentials' | awk '{ print $1; }')"
     ) &>/dev/null
 }
-argv() {
+
+function argv() {
     arg="${1}"
     default="${2}"
     shift; shift
     echo "${*}" | grep "\-\-${arg}" &>/dev/null \
         && echo "${*}" | sed -E "s/.*--${arg} ([^ ]*)(.*)?/\1/" \
         || echo "${default}"
+}
+
+function _selaws() {
+    local config="${HOME}/.aws/config"
+    local _AWS_PROFILE
+    test ! -f ${config} && echo "File ${config} does not exist" && return 1
+    # If user has fzf installed$
+    which fzf 2>&1 >/dev/null
+    if [[ $? -ne 0 ]]; then
+        select _aws_profile in $(cat "${config}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
+            _AWS_PROFILE=$_aws_profile;
+            break;
+        done
+    else
+        _AWS_PROFILE=$(cat ~/.aws/config | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/' | fzf)
+    fi
+
+    echo "${_AWS_PROFILE}"
 }
 
 readonly AWS_CONFIG="${HOME}/.aws/config"
@@ -41,11 +63,7 @@ ROLE_ARN="$(argv role-arn "" "${*:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
-[[ -z "${PROFILE_NAME}" ]] && select _profile in $(sed '/\[profile/!d; s/^\[profile \([^]]*\)\]/\1/' "${HOME}/.aws/config")
-do
-    PROFILE_NAME="${_profile}"
-    break
-done
+[[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
 
 PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG}")"
 
