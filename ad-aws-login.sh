@@ -19,13 +19,13 @@ EOF
     exit 128
 }
 
-trap cleanup EXIT
 function cleanup() {
     (
         rm -f "${TEMP_FILE}" || true
         kill "$(pgrep -lf 'Chrome.app' | grep 'temporary_aws_credentials' | awk '{ print $1; }')"
     ) &>/dev/null
 }
+trap cleanup EXIT
 
 function argv() {
     arg="${1}"
@@ -39,16 +39,15 @@ function argv() {
 function _selaws() {
     local config="${HOME}/.aws/config"
     local _AWS_PROFILE
-    test ! -f ${config} && echo "File ${config} does not exist" && return 1
-    # If user has fzf installed$
-    which fzf 2>&1 >/dev/null
-    if [[ $? -ne 0 ]]; then
-        select _aws_profile in $(cat "${config}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
-            _AWS_PROFILE=$_aws_profile;
-            break;
-        done
+    test ! -f "${config}" && echo "File ${config} does not exist" && return 1
+    # If user has fzf installed
+    if which fzf >/dev/null 2>&1; then
+        _AWS_PROFILE=$(grep '\[profile' < "${config}" | sed 's/\[profile \(.*\)]/\1/' | fzf)
     else
-        _AWS_PROFILE=$(cat ~/.aws/config | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/' | fzf)
+        select _aws_profile in $(grep '\[profile' < "${config}" | sed 's/\[profile \(.*\)]/\1/'); do
+            _AWS_PROFILE=$_aws_profile
+            break
+        done
     fi
 
     echo "${_AWS_PROFILE}"
@@ -96,7 +95,7 @@ fi
 
 cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
 awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' ${AWS_CREDENTIALS}.bak > ${AWS_CREDENTIALS}
-printf "\n[${PROFILE_NAME}]\n" >> ${AWS_CREDENTIALS}
+printf "\n[%s]\n" "${PROFILE_NAME}" >> ${AWS_CREDENTIALS}
 cat "${TEMP_FILE}" >> "${AWS_CREDENTIALS}"
 echo "Updated profile ${PROFILE_NAME}."
 tail -1 ${AWS_CREDENTIALS}
