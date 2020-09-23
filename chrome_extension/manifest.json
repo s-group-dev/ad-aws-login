@@ -3,7 +3,6 @@
   "manifest_version": 2,
   "name": "AWS AD credentials fetcher",
   "version": "1.0",
-
   // Optional
   "background": {
     "scripts": [
@@ -14,16 +13,28 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://login.microsoftonline.com/common/oauth2/authorize*"],
-      "js": ["select_user.js"]
+      "matches": [
+        "https://login.microsoftonline.com/common/oauth2/authorize*"
+      ],
+      "js": [
+        "select_user.js"
+      ]
     },
     {
-      "matches": ["https://account.activedirectory.windowsazure.com/*"],
-      "js": ["select_app.js"]
+      "matches": [
+        "https://myapplications.microsoft.com/*"
+      ],
+      "js": [
+        "select_app.js"
+      ]
     },
     {
-      "matches": ["https://signin.aws.amazon.com/saml"],
-      "js": ["select_role.js"]
+      "matches": [
+        "https://signin.aws.amazon.com/saml"
+      ],
+      "js": [
+        "select_role.js"
+      ]
     }
   ],
   "permissions": [
