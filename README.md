@@ -5,9 +5,9 @@ login (https://myapps.microsoft.com).
 
 So far this has been used **only on OS X**.
 
-The script launches Chrome with a separate session and helps you through the
-login with a dedicated Chrome extension. Because this is a new session,
-Chrome will ask you about default browser etc. And if you choose "Remember
+The script launches Microsoft Edge with a separate session and helps you through the
+login with a dedicated extension. Because this is a new session,
+Edge will ask you about default browser etc. And if you choose "Remember
 me" on the first login, you don't need to enter your username all the time.
 
 The motivation for all this was to get rid of the host of dependencies
