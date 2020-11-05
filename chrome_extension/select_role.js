@@ -1,5 +1,7 @@
 'use strict';
 
+// if user did not specify role arn from the command line,
+// let the user to select the role arn from the AWS list.
 chrome.runtime.sendMessage({type: "AWS_AD_credentials_get_role", key: "roleArn"}, function(response) {
     const roleName = response.toUpperCase()
     if (roleName) {

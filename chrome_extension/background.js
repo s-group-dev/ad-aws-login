@@ -1,6 +1,8 @@
 (function () {
     'use strict';
 
+    // these are the default values
+    // may be overwritten in readUrlParams()
     let parameters = {
         durationHours: 4,
         filename: "temporary_aws_credentials.txt"

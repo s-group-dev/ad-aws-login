@@ -1,5 +1,6 @@
 'use strict';
 
+// clicks the correct aws link in the myapplications.microsoft.com
 chrome.runtime.sendMessage({ type: "AWS_AD_credentials_fetcher_get_parameter", key: "app" }, function (response) {
     const appName = response.toUpperCase()
     if (!appName) {
