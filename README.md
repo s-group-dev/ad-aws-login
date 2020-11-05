@@ -61,7 +61,7 @@ to select them in browser. Can be written in the `.aws/config` file aswell. `Wri
 under a profile called `sandbox`:
 
 ```
-./ad-aws-login.sh --profile sandbox --app "AWS%20test" --duration-hours 4 --role-arn arn:aws:iam::123456789012:role/Developer
+./ad-aws-login.sh --profile sandbox --app "AWS%20test" --duration 4 --role-arn arn:aws:iam::123456789012:role/Developer
 # Unset any lingering AWS credentials from environment
 unset AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
 # Set active profile to andbox
@@ -80,7 +80,7 @@ role_arn=arn:aws:iam::123456789012:role/Developer
 ```
 
 **Note** Your account probably has some maximum session duration. Trying to
-use longer `--duration-hours` will cause the script to get stuck.
+use longer `--duration` will cause the script to get stuck.
 
 **Pro tip:** Put this in a bash alias or script.
 
