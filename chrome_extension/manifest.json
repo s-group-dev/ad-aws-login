@@ -6,6 +6,7 @@
   // Optional
   "background": {
     "scripts": [
+      "parameters.js",
       "background.js",
       "aws-sdk-2.673.min.js"
     ],
@@ -25,6 +26,7 @@
         "https://myapplications.microsoft.com/*"
       ],
       "js": [
+        "parameters.js",
         "select_app.js"
       ]
     },
@@ -33,6 +35,7 @@
         "https://signin.aws.amazon.com/saml"
       ],
       "js": [
+        "parameters.js",
         "select_role.js"
       ]
     }

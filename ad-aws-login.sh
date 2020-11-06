@@ -31,9 +31,16 @@ function argv() {
     arg="${1}"
     default="${2}"
     shift; shift
-    echo "${*}" | grep "\-\-${arg}" &>/dev/null \
-        && echo "${*}" | sed -E "s/.*--${arg} ([^ ]*)(.*)?/\1/" \
-        || echo "${default}"
+
+    while (( "$#" )); do
+        if [[ "$1" == "--${arg}" ]]; then
+            echo "$2"
+            return
+        fi
+        shift; shift
+    done
+
+    echo "${default}"
 }
 
 function _selaws() {
@@ -55,10 +62,10 @@ function _selaws() {
 
 readonly AWS_CONFIG="${HOME}/.aws/config"
 
-PROFILE_NAME="$(argv profile "" "${*:-}")"
-APP_NAME="$(argv app "" "${*:-}")"
-DURATION_HOURS="$(argv duration 8 "${*:-}")"
-ROLE_ARN="$(argv role-arn "" "${*:-}")"
+PROFILE_NAME="$(argv profile "" "${@:-}")"
+APP_NAME="$(argv app "" "${@:-}")"
+DURATION_HOURS="$(argv duration 8 "${@:-}")"
+ROLE_ARN="$(argv role-arn "" "${@:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
@@ -74,11 +81,18 @@ if [[ -z $ROLE_ARN ]]; then
     ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
+echo "const parameters = {
+  durationHours: ${DURATION_HOURS},
+  appName: \"${APP_NAME}\",
+  filename: \"$(basename "${TEMP_FILE}")\",
+  roleArn: \"${ROLE_ARN}\"
+};" > "${PWD}/chrome_extension/parameters.js"
+
 #/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
 /Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
     --load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" \
     --user-data-dir="${PWD}/user_data" \
-    "http://localhost/?durationHours=${DURATION_HOURS}&app=${APP_NAME}&filename=$(basename "${TEMP_FILE}")&roleArn=${ROLE_ARN}" 2>/dev/null &
+    "https://myapps.microsoft.com" 2>/dev/null &
 
 PID=$!
 

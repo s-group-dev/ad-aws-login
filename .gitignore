@@ -1,4 +1,5 @@
 user_data
+chrome_extension/parameters.js
 
 # editor: vim
 *.swo
