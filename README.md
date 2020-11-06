@@ -47,7 +47,7 @@ Usage: ${0} [OPTIONS]
 Options:
   --profile  TEXT    The name of the profile in ~/.aws/credentials to update.
   --app      TEXT    A substring of the app name shown in myapps.microsoft.com
-                     to launch. Case-insensitive. Must be url encoded.
+                     to launch. Case-insensitive.
   --duration INTEGER How many hours the temporary credentials are valid.
   --role-arn TEXT    AWS IAM Role to assume with AD credentials.
 ```
@@ -56,12 +56,12 @@ Options:
 
 Log in to your sandbox account. Assuming the link to the sandbox account in
 myapps.microsoft.com is called "AWS test", then `--app` argument should be
-"AWS%20test". If `--app` or `--role-arn` is missing from parameters, you are asked
+"AWS test". If `--app` or `--role-arn` is missing from parameters, you are asked
 to select them in browser. Can be written in the `.aws/config` file aswell. `Write temporary credentials to `~/.aws/credentials`
 under a profile called `sandbox`:
 
 ```
-./ad-aws-login.sh --profile sandbox --app "AWS%20test" --duration 4 --role-arn arn:aws:iam::123456789012:role/Developer
+./ad-aws-login.sh --profile sandbox --app "AWS test" --duration 4 --role-arn arn:aws:iam::123456789012:role/Developer
 # Unset any lingering AWS credentials from environment
 unset AWS_SESSION_TOKEN AWS_ACCESS_KEY_ID AWS_SECRET_ACCESS_KEY
 # Set active profile to andbox
@@ -72,7 +72,7 @@ You can also configure your profile in `.aws/config`. Do note that profiles shou
 ```
 [profile test-admin]
 region=eu-west-1
-app=AWS%20test
+app=AWS test
 role_arn=arn:aws:iam::123456789012:role/Developer
 
 [profile another-profile]

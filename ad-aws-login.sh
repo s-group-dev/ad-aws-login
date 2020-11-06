@@ -81,11 +81,18 @@ if [[ -z $ROLE_ARN ]]; then
     ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
+echo "const parameters = {
+  durationHours: ${DURATION_HOURS},
+  appName: \"${APP_NAME}\",
+  filename: \"$(basename "${TEMP_FILE}")\",
+  roleArn: \"${ROLE_ARN}\"
+};" > "${PWD}/chrome_extension/parameters.js"
+
 #/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
 /Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
     --load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" \
     --user-data-dir="${PWD}/user_data" \
-    "http://localhost/?durationHours=${DURATION_HOURS}&app=${APP_NAME}&filename=$(basename "${TEMP_FILE}")&roleArn=${ROLE_ARN}" 2>/dev/null &
+    "https://myapps.microsoft.com" 2>/dev/null &
 
 PID=$!
 
