@@ -31,9 +31,16 @@ function argv() {
     arg="${1}"
     default="${2}"
     shift; shift
-    echo "${*}" | grep "\-\-${arg}" &>/dev/null \
-        && echo "${*}" | sed -E "s/.*--${arg} ([^ ]*)(.*)?/\1/" \
-        || echo "${default}"
+
+    while (( "$#" )); do
+        if [[ "$1" == "--${arg}" ]]; then
+            echo "$2"
+            return
+        fi
+        shift; shift
+    done
+
+    echo "${default}"
 }
 
 function _selaws() {
@@ -55,10 +62,10 @@ function _selaws() {
 
 readonly AWS_CONFIG="${HOME}/.aws/config"
 
-PROFILE_NAME="$(argv profile "" "${*:-}")"
-APP_NAME="$(argv app "" "${*:-}")"
-DURATION_HOURS="$(argv duration 8 "${*:-}")"
-ROLE_ARN="$(argv role-arn "" "${*:-}")"
+PROFILE_NAME="$(argv profile "" "${@:-}")"
+APP_NAME="$(argv app "" "${@:-}")"
+DURATION_HOURS="$(argv duration 8 "${@:-}")"
+ROLE_ARN="$(argv role-arn "" "${@:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
