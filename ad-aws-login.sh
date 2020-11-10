@@ -19,36 +19,42 @@ EOF
     exit 128
 }
 
-trap cleanup EXIT
 function cleanup() {
     (
         rm -f "${TEMP_FILE}" || true
         kill "$(pgrep -lf 'Chrome.app' | grep 'temporary_aws_credentials' | awk '{ print $1; }')"
     ) &>/dev/null
 }
+trap cleanup EXIT
 
 function argv() {
     arg="${1}"
     default="${2}"
     shift; shift
-    echo "${*}" | grep "\-\-${arg}" &>/dev/null \
-        && echo "${*}" | sed -E "s/.*--${arg} ([^ ]*)(.*)?/\1/" \
-        || echo "${default}"
+
+    while (( "$#" )); do
+        if [[ "$1" == "--${arg}" ]]; then
+            echo "$2"
+            return
+        fi
+        shift; shift
+    done
+
+    echo "${default}"
 }
 
 function _selaws() {
     local config="${HOME}/.aws/config"
     local _AWS_PROFILE
-    test ! -f ${config} && echo "File ${config} does not exist" && return 1
-    # If user has fzf installed$
-    which fzf 2>&1 >/dev/null
-    if [[ $? -ne 0 ]]; then
-        select _aws_profile in $(cat "${config}" | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/'); do
-            _AWS_PROFILE=$_aws_profile;
-            break;
-        done
+    test ! -f "${config}" && echo "File ${config} does not exist" && return 1
+    # If user has fzf installed
+    if which fzf >/dev/null 2>&1; then
+        _AWS_PROFILE=$(grep '\[profile' < "${config}" | sed 's/\[profile \(.*\)]/\1/' | fzf)
     else
-        _AWS_PROFILE=$(cat ~/.aws/config | grep '\[profile' | sed 's/\[profile \(.*\)]/\1/' | fzf)
+        select _aws_profile in $(grep '\[profile' < "${config}" | sed 's/\[profile \(.*\)]/\1/'); do
+            _AWS_PROFILE=$_aws_profile
+            break
+        done
     fi
 
     echo "${_AWS_PROFILE}"
@@ -56,10 +62,10 @@ function _selaws() {
 
 readonly AWS_CONFIG="${HOME}/.aws/config"
 
-PROFILE_NAME="$(argv profile "" "${*:-}")"
-APP_NAME="$(argv app "" "${*:-}")"
-DURATION_HOURS="$(argv duration 8 "${*:-}")"
-ROLE_ARN="$(argv role-arn "" "${*:-}")"
+PROFILE_NAME="$(argv profile "" "${@:-}")"
+APP_NAME="$(argv app "" "${@:-}")"
+DURATION_HOURS="$(argv duration 8 "${@:-}")"
+ROLE_ARN="$(argv role-arn "" "${@:-}")"
 AWS_CREDENTIALS=~/.aws/credentials
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
@@ -75,11 +81,18 @@ if [[ -z $ROLE_ARN ]]; then
     ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
+echo "const parameters = {
+  durationHours: ${DURATION_HOURS},
+  appName: \"${APP_NAME}\",
+  filename: \"$(basename "${TEMP_FILE}")\",
+  roleArn: \"${ROLE_ARN}\"
+};" > "${PWD}/chrome_extension/parameters.js"
+
 #/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
 /Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
     --load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" \
     --user-data-dir="${PWD}/user_data" \
-    "http://localhost/?durationHours=${DURATION_HOURS}&app=${APP_NAME}&filename=$(basename "${TEMP_FILE}")&roleArn=${ROLE_ARN}" 2>/dev/null &
+    "https://myapps.microsoft.com" 2>/dev/null &
 
 PID=$!
 
@@ -96,7 +109,7 @@ fi
 
 cp $AWS_CREDENTIALS $AWS_CREDENTIALS.bak
 awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' ${AWS_CREDENTIALS}.bak > ${AWS_CREDENTIALS}
-printf "\n[${PROFILE_NAME}]\n" >> ${AWS_CREDENTIALS}
+printf "\n[%s]\n" "${PROFILE_NAME}" >> ${AWS_CREDENTIALS}
 cat "${TEMP_FILE}" >> "${AWS_CREDENTIALS}"
 echo "Updated profile ${PROFILE_NAME}."
 tail -1 ${AWS_CREDENTIALS}

@@ -1,11 +1,6 @@
 (function () {
     'use strict';
 
-    let parameters = {
-        durationHours: 4,
-        filename: "temporary_aws_credentials.txt"
-    }
-
     function saveCredentials(credentials) {
         const data =
             `aws_access_key_id=${credentials.AccessKeyId}
@@ -21,21 +16,7 @@ aws_session_expiration=${credentials.Expiration.toJSON()}
         });
     }
 
-    function readUrlParams(url) {
-        let keyValues = url.slice(url.indexOf('?') + 1).split('&')
-        keyValues.map(keyValue => {
-            let [key, val] = keyValue.split('=')
-            parameters[key] = decodeURIComponent(val)
-        })
-    }
-
     chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
-        if (request.type === 'AWS_AD_credentials_fetcher_get_parameter') {
-            sendResponse(parameters[request.key])
-        }
-        if (request.type === "AWS_AD_credentials_get_role") {
-            sendResponse(parameters[request.key])
-        }
         if (request.type === 'AWS_AD_Credentials_set_role') {
             parameters.roleArn = request.roleArn;
         }
@@ -43,11 +24,6 @@ aws_session_expiration=${credentials.Expiration.toJSON()}
     });
 
     function onBeforeRequestListener(details) {
-        if (details.url.startsWith('http://localhost/')) {
-            readUrlParams(details.url)
-            return { redirectUrl: 'https://myapps.microsoft.com' }
-        }
-
         // ignore everything except redirect to aws
         if (details.url !== 'https://signin.aws.amazon.com/saml') {
             return

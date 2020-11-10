@@ -1,29 +1,27 @@
 'use strict';
 
-chrome.runtime.sendMessage({ type: "AWS_AD_credentials_fetcher_get_parameter", key: "app" }, function (response) {
-    const appName = response.toUpperCase()
-    if (!appName) {
+// clicks the correct aws link in the myapplications.microsoft.com
+(function () {
+    if (!parameters.appName) {
         console.warn("No app parameter specified. Select app manually.")
         return
     }
-    const clickInternval = setInterval(function () {
-        const tiles = document.getElementsByClassName('ms-List-cell')
-        for (var i = 0; i < tiles.length; ++i) {
-            const links = tiles[i].getElementsByTagName('a');
-            for (var j = 0; j < links.length; j++) {
-                const clickableLink = links[j]
-                for (var c = 0; c < links[j].childNodes.length; c++) {
-                    const b = links[j].childNodes[c]
-                    if (b.innerText.toUpperCase().includes(appName)) {
-                        clickableLink.click()
-                        clearInterval(clickInternval)
-                        break
+
+    // earlier appName was url encoded,
+    // decode it for compatibility with old alias people may have.
+    const appNameUpper = decodeURI(parameters.appName).toUpperCase()
+    const clickInterval = setInterval(function () {
+        for (const tile of document.getElementsByClassName('ms-List-cell')) {
+            for (const link of tile.getElementsByTagName('a')) {
+                for (const node of Array.from(link.childNodes)) {
+                    if (node.innerText.toUpperCase().includes(appNameUpper)) {
+                        link.click()
+                        clearInterval(clickInterval)
+                        return
                     }
                 }
-
             }
-
         }
     }, 100)
-})
+}())
 
