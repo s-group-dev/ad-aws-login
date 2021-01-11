@@ -8,7 +8,7 @@
     "scripts": [
       "parameters.js",
       "background.js",
-      "aws-sdk-2.673.min.js"
+      "aws-sdk-2.824.min.js"
     ],
     "persistent": true
   },
