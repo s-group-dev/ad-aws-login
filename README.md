@@ -1,3 +1,10 @@
+<!-- Analysis -->
+![GitHub language count](https://img.shields.io/github/languages/count/s-group-dev/ad-aws-login)
+![GitHub top language](https://img.shields.io/github/languages/top/s-group-dev/ad-aws-login)<!-- Size -->
+![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/s-group-dev/ad-aws-login)
+![Lines of code](https://img.shields.io/tokei/lines/github/s-group-dev/ad-aws-login)<!-- Activity -->
+![GitHub contributors](https://img.shields.io/github/contributors/s-group-dev/ad-aws-login)
+
 # Azure AD Login to AWS
 
 The `ad-aws-login.sh` script fetches temporary AWS credentials with Azude AD
