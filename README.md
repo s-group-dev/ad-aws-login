@@ -41,6 +41,8 @@ role_arn=<arn for the role to assume>
 app=A substring of the app name shown in myapps.microsoft.com to launch. Case-insensitive. Must be url encoded.
 ```
 
+Add `bin/` to your `$PATH` to get `ad-aws-login` available everywhere.
+
 ## Usage
 
 Option `--profile` is mandatory.
