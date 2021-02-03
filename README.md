@@ -46,7 +46,7 @@ app=A substring of the app name shown in myapps.microsoft.com to launch. Case-in
 Option `--profile` is mandatory.
 
 ```
-Usage: ${0} [OPTIONS]
+Usage: ./ad-aws-login.sh [OPTIONS]
 
   Simple script that fetches temporary AWS credentials with Azude AD login
   (https://myapps.microsoft.com).
@@ -117,6 +117,9 @@ If you have [fzf](https://github.com/junegunn/fzf) installed, `aws-aws-login` wi
 `master` branch is protected from direct pushes. 
 
 Software is versioned using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) by [GitHub Actions](.github/workflows/main.yml) with [Conventional Changelog action](https://github.com/TriPSs/conventional-changelog-action). It will *will bump version, tag commit and generate a changelog with conventional commits*.
+
+With fzf, here's a handy script:
+`selaws='export AWS_PROFILE=$(cat ~/.aws/config | grep "\[profile" | sed "s/\[profile \(.*\)]/\1/" | fzf)'`
 
 ## TODO
 
