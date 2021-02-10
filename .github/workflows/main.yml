@@ -12,7 +12,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
       with:
-        token: ${{ secrets.GITHUB_TOKEN_ACTION }}
+        token: ${{ secrets.GITHUB_TOKEN }}
     - name: Bump version and push tag
       uses: TriPSs/conventional-changelog-action@v3.7.1
       with:
