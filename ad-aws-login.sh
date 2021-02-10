@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-cd "$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd | sed 's|/bin$||' )"
+d="$(cd "$(dirname "${0}")" && pwd)"; cd "${d%/bin}"
 
 function usage() {
     cat <<EOF
