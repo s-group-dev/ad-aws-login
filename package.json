@@ -1,0 +1,26 @@
+{
+  "name": "ad-aws-login",
+  "version": "1.0.0",
+  "description": "Minimalistic script to fetch aws credentials with Azure AD integration",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/s-group-dev/ad-aws-login.git"
+  },
+  "keywords": [
+    "aws",
+    "ad",
+    "azure",
+    "login",
+    "js",
+    "javascript",
+    "bash",
+    "minimalistic",
+    "credentials"
+  ],
+  "author": "S Group",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/s-group-dev/ad-aws-login/issues"
+  },
+  "homepage": "https://github.com/s-group-dev/ad-aws-login#readme"
+}
