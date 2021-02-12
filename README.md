@@ -5,10 +5,10 @@ login (https://myapps.microsoft.com).
 
 So far this has been used **only on OS X**.
 
-The script launches Microsoft Edge with a separate session and helps you through the
-login with a dedicated extension. Because this is a new session,
-Edge will ask you about default browser etc. And if you choose "Remember
-me" on the first login, you don't need to enter your username all the time.
+The script launches Microsoft Edge with a separate session and helps you
+through the login with a dedicated extension. Because this is a new session,
+Edge will ask you about default browser etc. And if you choose "Remember me"
+on the first login, you don't need to enter your username all the time.
 
 The motivation for all this was to get rid of the host of dependencies
 [aws-azure-login](https://github.com/sportradar/aws-azure-login) requires.
@@ -52,12 +52,31 @@ Options:
   --role-arn TEXT    AWS IAM Role to assume with AD credentials.
 ```
 
+You can also run it without any parameters and it will pick up any settings from your `~/.aws/config` and ask for others.
+
+## Installation
+
+You can run the script from this directory or add `bin` to your path like this:
+```
+echo "export PATH=\"\${PATH}:$(pwd)/bin\"" >> ~/.zshrc
+# OR
+echo "export PATH=\"\${PATH}:$(pwd)/bin\"" >> ~/.bashrc
+```
+
+... depending of your shell.
+
+By adding this to your path, you can run
+```
+ad-aws-login  # to run the script
+. selaws      # to export AWS_PROFILE to your session
+```
+
 ## Example
 
 Log in to your sandbox account. Assuming the link to the sandbox account in
 myapps.microsoft.com is called "AWS test", then `--app` argument should be
 "AWS test". If `--app` or `--role-arn` is missing from parameters, you are asked
-to select them in browser. Can be written in the `.aws/config` file aswell. `Write temporary credentials to `~/.aws/credentials`
+to select them in browser. Can be written in the `.aws/config` file aswell. Write temporary credentials to `~/.aws/credentials` 
 under a profile called `sandbox`:
 
 ```
@@ -82,12 +101,9 @@ role_arn=arn:aws:iam::123456789012:role/Developer
 **Note** Your account probably has some maximum session duration. Trying to
 use longer `--duration` will cause the script to get stuck.
 
-**Pro tip:** Put this in a bash alias or script.
-
 ## Useful commands
 
-If you have [fzf](https://github.com/junegunn/fzf) installed, it
-will be beneficial.
+If you have [fzf](https://github.com/junegunn/fzf) installed, `aws-aws-login` will use it automatically for better experience.
 
 ## TODO
 
