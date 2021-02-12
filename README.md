@@ -105,6 +105,12 @@ use longer `--duration` will cause the script to get stuck.
 
 If you have [fzf](https://github.com/junegunn/fzf) installed, `aws-aws-login` will use it automatically for better experience.
 
+## Contributing
+
+`master` branch is protected from direct pushes. 
+
+Software is versioned using [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) by [GitHub Actions](.github/workflows/main.yml) with [Conventional Changelog action](https://github.com/TriPSs/conventional-changelog-action). It will *will bump version, tag commit and generate a changelog with conventional commits*.
+
 ## TODO
 
 * Downloading the credentials from chrome as a file is not that neat. Is there
