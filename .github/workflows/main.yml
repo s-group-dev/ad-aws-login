@@ -1,13 +1,20 @@
-- name: "Automated Version Bump"
-  uses: phips28/gh-action-bump-version@8.0.18
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  with:
-    tag-prefix:  ''
-    outputFile: 'CHANGELOG.md'
+name: 'Release'
+on:
+  push:
+    bracnhes:
+      - 'master'
 
-- name: "Build Changelog"
-  id: build_changelog
-  uses: mikepenz/release-changelog-builder-action@1.4.3
-  env:
-    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+jobs:
+  - name: "Automated Version Bump"
+    uses: phips28/gh-action-bump-version@8.0.18
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    with:
+      tag-prefix:  ''
+      outputFile: 'CHANGELOG.md'
+
+  - name: "Build Changelog"
+    id: build_changelog
+    uses: mikepenz/release-changelog-builder-action@1.4.3
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
