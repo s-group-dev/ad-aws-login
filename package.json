@@ -1,6 +1,6 @@
 {
   "name": "ad-aws-login",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Minimalistic script to fetch aws credentials with Azure AD integration",
   "repository": {
     "type": "git",
