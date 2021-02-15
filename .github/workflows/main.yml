@@ -1,8 +1,14 @@
 name: "Bump Version"
 on:
   push:
-    bracnhes:
-      - 'master'
+    branches:
+      - master
+
+name: release
+on:
+  push:
+    tags:
+      - "v*"
 
 jobs:
   bump-version:
@@ -34,8 +40,13 @@ jobs:
           NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
         run: echo "new tag $NEW_TAG"
 
+  release:
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
       - name: "Build Changelog"
-        id: build_changelog
+        id: Release
         uses: mikepenz/release-changelog-builder-action@v1.4.3
         with:
           outputFile: 'CHANGELOG.md'
