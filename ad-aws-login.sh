@@ -74,11 +74,11 @@ TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S
 PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG}")"
 
 if [[ -z $APP_NAME ]]; then
-    APP_NAME=$(echo "${PROFILE_CONFIG}" | (grep 'app.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
+    APP_NAME=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
 fi
 
 if [[ -z $ROLE_ARN ]]; then
-    ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
+    ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn=.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 fi
 
 echo "const parameters = {
