@@ -35,7 +35,7 @@ jobs:
         run: echo "new tag $NEW_TAG"
 
   release:
-    needs: bump-version
+    name: "Create changelog"
     if: startsWith(github.ref, 'refs/tags/v')
     runs-on: ubuntu-latest
 
