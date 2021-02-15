@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-cd "$(dirname "$0")"
+d="$(cd "$(dirname "${0}")" && pwd)"; cd "${d%/bin}"
 
 function usage() {
     cat <<EOF
