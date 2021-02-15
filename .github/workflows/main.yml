@@ -1,23 +1,43 @@
-name: 'release'
+name: "Bump Version"
 on:
   push:
     bracnhes:
       - 'master'
 
 jobs:
-  release:
+  bump-version:
+    name: "Bump Version on master"
     runs-on: ubuntu-latest
+
     steps:
-      - name: 'Automated Version Bump'
-        uses: phips28/gh-action-bump-version@8.0.18
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
+        with:
+          ref: ${{ github.ref }}
+      - name: "cat package.json"
+        run: cat ./package.json
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v1"
+        with:
+          node-version: 12
+      - name: "Automated Version Bump"
+        id: version-bump
+        uses: "phips28/gh-action-bump-version@v8.0.18"
+        with:
+          tag-prefix: ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag-prefix:  ''
-          outputFile: 'CHANGELOG.md'
+      - name: "cat package.json"
+        run: cat ./package.json
+      - name:  'Output Step'
+        env:
+          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+        run: echo "new tag $NEW_TAG"
 
-      - name: 'Build Changelog'
+      - name: "Build Changelog"
         id: build_changelog
-        uses: mikepenz/release-changelog-builder-action@1.4.3
+        uses: mikepenz/release-changelog-builder-action@v1.4.3
+        with:
+          outputFile: 'CHANGELOG.md'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
