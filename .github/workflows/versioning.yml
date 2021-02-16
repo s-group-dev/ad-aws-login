@@ -49,6 +49,8 @@ jobs:
       - name: Build Changelog
         uses: scottbrenner/generate-changelog-action@1.0.3
         id: Changelog
+        with:
+          output: 'CHANGELOG.md'
 
       - name: Create Release
         uses: actions/create-release@v1.1.4
