@@ -2,7 +2,7 @@ name: Bump Version
 on:
   push:
     branches:
-      - nk/docs
+      - master
 
 jobs:
   bump-version:
