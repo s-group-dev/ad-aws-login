@@ -2,7 +2,7 @@ name: Bump Version
 on:
   push:
     branches:
-      - master
+      - nk/docs
 
 jobs:
   bump-version:
@@ -49,7 +49,6 @@ jobs:
       - name: Build Changelog
         uses: scottbrenner/generate-changelog-action@1.0.3
         id: Changelog
-          token: ${{ secrets.GITHUB_TOKEN }}}
 
       - name: Create Release
         uses: actions/create-release@v1.1.4
