@@ -6,7 +6,7 @@ on:
 
 jobs:
   bump-version:
-    name: "Bump Version on master"
+    name: Bump Version on master
     runs-on: ubuntu-latest
 
     steps:
@@ -39,18 +39,17 @@ jobs:
         run: echo "new tag $NEW_TAG"
 
   release:
-    name: Release
+    name: Create Release
     runs-on: ubuntu-latest
     needs: bump-version
     steps:
-      - name: Checkout code
+      - name: Checkout Code
         uses: actions/checkout@v2
 
       - name: Build Changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v1.4.3
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        uses: scottbrenner/generate-changelog-action@1.0.3
+        id: Changelog
+          token: ${{ secrets.GITHUB_TOKEN }}}
 
       - name: Create Release
         uses: actions/create-release@v1.1.4
