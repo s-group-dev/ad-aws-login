@@ -1,15 +1,15 @@
 name: Keep the versions up-to-date
 
 on:
-  push:
-    branches:
-      - nk/docs
+  release:
+    types: [published, edited]
 
 jobs:
   run-tag-latest:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v2
 
       - uses: Actions-R-Us/actions-tagger@v2.0.1
         env:
