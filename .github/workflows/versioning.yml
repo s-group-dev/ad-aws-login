@@ -8,14 +8,18 @@ on:
       - 'CHANGELOG.md'
 
 jobs:
-  bump-version:
+  build:
     name: "Conventional Changelog Action"
     runs-on: ubuntu-latest
+
     steps:
       - name: "📥 Checkout"
-        uses: actions/checkout@v1
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: "🚀️ Generate release changelog"
+      - name: "🚀️ Bump version and push tag"
         uses: TriPSs/conventional-changelog-action@v3.7.1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
+          tag-prefix: 'v'
