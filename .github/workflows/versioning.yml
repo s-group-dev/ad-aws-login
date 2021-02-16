@@ -3,6 +3,9 @@ on:
   push:
     branches:
       - master
+    paths-ignore:
+      - 'package.json'
+      - 'CHANGELOG.md'
 
 jobs:
   bump-version:
