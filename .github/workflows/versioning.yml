@@ -14,5 +14,3 @@ jobs:
       - uses: Actions-R-Us/actions-tagger@v2.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.github_token }}
-        with:
-          publish_latest_tag: 'false'
