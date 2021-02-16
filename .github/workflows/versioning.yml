@@ -1,16 +1,39 @@
-name: Keep the versions up-to-date
-
+name: Bump Version
 on:
-  release:
-    types: [published, edited]
+  push:
+    branches:
+      - nk/docs
 
 jobs:
-  run-tag-latest:
+  bump-version:
+    name: "Bump Version on master"
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2
 
-      - uses: Actions-R-Us/actions-tagger@v2.0.1
+    steps:
+      - name: "Checkout source code"
+        uses: "actions/checkout@v2"
+        with:
+          ref: ${{ github.ref }}
+
+      - name: "cat package.json"
+        run: cat ./package.json
+
+      - name: "Setup Node.js"
+        uses: "actions/setup-node@v1"
+        with:
+          node-version: 12
+
+      - name: "Automated Version Bump"
+        id: version-bump
+        uses: "phips28/gh-action-bump-version@v8.0.18"
+        with:
+          tag-prefix: ''
         env:
-          GITHUB_TOKEN: ${{ secrets.github_token }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "cat package.json"
+        run: cat ./package.json
+      - name:  'Output Step'
+        env:
+          NEW_TAG: ${{ steps.version-bump.outputs.newTag }}
+        run: echo "new tag $NEW_TAG"
