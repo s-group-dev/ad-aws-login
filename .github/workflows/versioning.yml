@@ -9,7 +9,7 @@ on:
 
 jobs:
   bump-version:
-    name: Create Release
+    name: "Conventional Changelog Action"
     runs-on: ubuntu-latest
     steps:
       - name: "📥 Checkout"
