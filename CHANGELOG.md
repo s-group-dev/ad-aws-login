@@ -1,3 +1,12 @@
+## [0.1.13](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.12...v0.1.13) (2021-02-18)
+
+
+### Bug Fixes
+
+* add missing export to selaws script ([dbb52eb](https://github.com/s-group-dev/ad-aws-login/commit/dbb52eb34cdf99f8e85203501a59d9a49317ac3d))
+
+
+
 ## [0.1.12](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.10...v0.1.12) (2021-02-16)
 
 
@@ -30,10 +39,6 @@
 
 
 ## [0.1.8](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.7...v0.1.8) (2021-02-15)
-
-
-
-## [0.1.7](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.6...v0.1.7) (2021-02-15)
 
 
 
