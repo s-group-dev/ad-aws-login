@@ -12,4 +12,6 @@ function _selaws() {
     fi
 }
 
-AWS_PROFILE="$(_selaws)"
+export AWS_PROFILE="$(_selaws)"
+
+# vim: syntax=sh
