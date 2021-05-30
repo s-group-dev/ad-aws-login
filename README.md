@@ -25,13 +25,15 @@ yourself from https://github.com/aws/aws-sdk-js/releases)
 
 ## How it works
 
-The script adds temporary credentials to `~/.aws/credentials`. You can then
-use those credentials by setting your `AWS_PROFILE` environment variable
-accordingly.
+The script adds temporary credentials to `~/.aws/credentials` (or the file
+configured by environment variable AWS_SHARED_CREDENTIALS_FILE, if defined).
+You can then use those credentials by setting your `AWS_PROFILE` environment
+variable accordingly.
 
 Logging in gets you into the role you've been assigned to by default. To
 assume other roles, it's recommended you have a section in `~/.aws/config`
-for each role you're going to use. Something like this:
+(or the file configured by environment variable AWS_CONFIG_FILE, if
+defined) for each role you're going to use. Something like this:
 
 ```
 [profile <profile name for role to assume>]
@@ -40,6 +42,9 @@ source_profile=<the profile name in ~/.aws/credentials you log in to>
 role_arn=<arn for the role to assume>
 app=A substring of the app name shown in myapps.microsoft.com to launch. Case-insensitive. Must be url encoded.
 ```
+
+Note: you might have to create the folder and touch the config file before
+running this script, if you are configuring AWS to a completely new location.
 
 Add `bin/` to your `$PATH` to get `ad-aws-login` available everywhere.
 
@@ -109,6 +114,19 @@ role_arn=arn:aws:iam::123456789012:role/Developer
 
 **Note** Your account probably has some maximum session duration. Trying to
 use longer `--duration` will cause the script to get stuck.
+
+If you don't want to mess up with your good ~/.aws folder, you can configure
+your profile / credentials to an alternative location:
+```
+export AWS_CONFIG_FILE="/somewhere/else/.aws-alt/config"
+export AWS_SHARED_CREDENTIALS_FILE="/somewhere/else/.aws-alt/credentials"
+mkdir -p /somewhere/else/.aws-alt
+touch /somewhere/else/.aws-alt/config
+./ad-aws-login.sh --profile sandbox --app "AWS test" --duration 4 --role-arn arn:aws:iam::123456789012:role/Developer
+```
+
+In order for aws cli to use this alternave .aws home (say, in a new shell),
+you must export AWS_CONFIG_FILE and AWS_SHARED_CREDENTIALS_FILE variables.
 
 ## Useful commands
 

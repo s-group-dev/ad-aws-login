@@ -4,6 +4,9 @@ set -euo pipefail
 
 d="$(cd "$(dirname "${0}")" && pwd)"; cd "${d%/bin}"
 
+AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
+AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-$HOME/.aws/credentials}"
+
 function usage() {
     cat <<EOF
 Usage: ${0} [OPTIONS]
@@ -44,7 +47,7 @@ function argv() {
 }
 
 function _selaws() {
-    local config="${HOME}/.aws/config"
+    local config="${AWS_CONFIG_FILE}"
     local _AWS_PROFILE
     test ! -f "${config}" && echo "File ${config} does not exist" && return 1
     # If user has fzf installed
@@ -60,13 +63,13 @@ function _selaws() {
     echo "${_AWS_PROFILE}"
 }
 
-readonly AWS_CONFIG="${HOME}/.aws/config"
+readonly AWS_CONFIG=$AWS_CONFIG_FILE
 
 PROFILE_NAME="$(argv profile "" "${@:-}")"
 APP_NAME="$(argv app "" "${@:-}")"
 DURATION_HOURS="$(argv duration 8 "${@:-}")"
 ROLE_ARN="$(argv role-arn "" "${@:-}")"
-AWS_CREDENTIALS=~/.aws/credentials
+AWS_CREDENTIALS=$AWS_SHARED_CREDENTIALS_FILE
 TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 
 [[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
