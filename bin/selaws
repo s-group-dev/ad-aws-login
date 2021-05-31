@@ -1,5 +1,8 @@
+AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
+AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-$HOME/.aws/credentials}"
+
 function _selaws() {
-    local config="${HOME}/.aws/config"
+    local config="${AWS_CONFIG_FILE}"
     test ! -f ${config} && echo "File ${config} does not exist" && return 1
     which fzf 2>&1 >/dev/null
     if [[ $? -ne 0 ]]; then
