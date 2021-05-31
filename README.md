@@ -7,12 +7,12 @@
 
 # Azure AD Login to AWS
 
-The `ad-aws-login` script fetches temporary AWS credentials with Azude AD
+The `ad-aws-login` scrip t fetches temporary AWS credentials with Azude AD
 login (https://myapps.microsoft.com).
 
-So far this has been used **only on OS X**.
+So far thi ds has been used **only on OS X** and with **Google Chrome** and **Microsoft Edge**.
 
-The script launches Microsoft Edge with a separate session and helps you
+The script launches browser with a separate session and helps you
 through the login with a dedicated extension. Because this is a new session,
 Edge will ask you about default browser etc. And if you choose "Remember me"
 on the first login, you don't need to enter your username all the time.
@@ -49,8 +49,6 @@ running this script, if you are configuring AWS to a completely new location.
 Add `bin/` to your `$PATH` to get `ad-aws-login` available everywhere.
 
 ## Usage
-
-Option `--profile` is mandatory.
 
 ```
 Usage: ad-aws-login [OPTIONS]
@@ -115,14 +113,13 @@ role_arn=arn:aws:iam::123456789012:role/Developer
 **Note** Your account probably has some maximum session duration. Trying to
 use longer `--duration` will cause the script to get stuck.
 
-If you don't want to mess up with your good ~/.aws folder, you can configure
-your profile / credentials to an alternative location:
+If you don't want script to modify your existing ~/.aws fikder, you can
+configure your profile / credentials to an alternative location:
 ```
 export AWS_CONFIG_FILE="/somewhere/else/.aws-alt/config"
 export AWS_SHARED_CREDENTIALS_FILE="/somewhere/else/.aws-alt/credentials"
 mkdir -p /somewhere/else/.aws-alt
-touch /somewhere/else/.aws-alt/config
-./ad-aws-login.sh --profile sandbox --app "AWS test" --duration 4 --role-arn arn:aws:iam::123456789012:role/Developer
+# and add your configuration there
 ```
 
 In order for aws cli to use this alternave .aws home (say, in a new shell),
