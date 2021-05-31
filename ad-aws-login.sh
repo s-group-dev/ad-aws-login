@@ -43,7 +43,6 @@ function _selaws() {
 readonly AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
 readonly AWS_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-$HOME/.aws/credentials}"
 readonly TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
-readonly AWS_CREDENTIALS=~/.aws/credentials
 readonly DURATION_HOURS="$(argv duration 8 "${@:-}")"
 readonly BROWSERS="Google Chrome
 Microsoft Edge"
@@ -86,7 +85,7 @@ EOF
 function cleanup() {
   (
     rm -f "${TEMP_FILE}" || true
-    kill "$(pgrep -lf \"${USER_BROWSER}.app\" | grep "${USER_BROWSER}.*--user-data-dir=${PWD}/user_data$" | awk '{ print $1; }')"
+    kill "$(pgrep -lf "${USER_BROWSER}.app" | grep "${USER_BROWSER}.*--user-data-dir=${PWD}/user_data$" | awk '{print $1;}')"
   ) &>/dev/null
 }
 
@@ -104,11 +103,12 @@ function handle_browser() {
   fi
   
   args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
-  open -a "${USER_BROWSER}" -F -n "http://myapps.microsoft.com" --args $args
+  # shellcheck disable=SC2086
+  open -a "${USER_BROWSER}" -F -n "http://myapps.microsoft.com" --args ${args}
   
   while true; do
-    PID=$(ps aux | grep "${USER_BROWSER}.*--user-data-dir=${PWD}/user_data$" | grep -v grep | awk '{print $2;}' || true)
-    if [[ ! -z "${PID}" ]]; then
+    PID=$(pgrep -lf "${USER_BROWSER}\.app.*--user-data-dir=${PWD}/user_data$" | grep -v grep | awk '{print $1;}' || true)
+    if [[ -n "${PID}" ]]; then
       break
     fi
     sleep 1
@@ -117,7 +117,7 @@ function handle_browser() {
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
 
   # kill this browser
-  kill $PID
+  kill "${PID}"
 }
 
 function create_params() {

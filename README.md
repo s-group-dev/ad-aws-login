@@ -7,10 +7,10 @@
 
 # Azure AD Login to AWS
 
-The `ad-aws-login` scrip t fetches temporary AWS credentials with Azude AD
+The `ad-aws-login` script fetches temporary AWS credentials with Azude AD
 login (https://myapps.microsoft.com).
 
-So far thi ds has been used **only on OS X** and with **Google Chrome** and **Microsoft Edge**.
+So far this has been used **only on OS X** and with **Google Chrome** and **Microsoft Edge**.
 
 The script launches browser with a separate session and helps you
 through the login with a dedicated extension. Because this is a new session,
