@@ -4,8 +4,13 @@ set -euo pipefail
 
 d="$(cd "$(dirname "${0}")" && pwd)"; cd "${d%/bin}"
 
+# CONSTANTS
 AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
 AWS_SHARED_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-$HOME/.aws/credentials}"
+
+# FUNCTIONS
+
+# MAIN
 
 function usage() {
     cat <<EOF
@@ -25,7 +30,7 @@ EOF
 function cleanup() {
     (
         rm -f "${TEMP_FILE}" || true
-        kill "$(pgrep -lf 'Chrome.app' | grep 'temporary_aws_credentials' | awk '{ print $1; }')"
+        kill "$(pgrep -lf \"${browser}.app\" | grep "${browser}.*--user-data-dir=${PWD}/user_data$" | awk '{ print $1; }')"
     ) &>/dev/null
 }
 trap cleanup EXIT
@@ -91,17 +96,35 @@ echo "const parameters = {
   roleArn: \"${ROLE_ARN}\"
 };" > "${PWD}/chrome_extension/parameters.js"
 
-#/Applications/Google\ Chrome.app/Contents/MacOS/Google\ Chrome \
-/Applications/Microsoft\ Edge.app/Contents/MacOS/Microsoft\ Edge \
-    --load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" \
-    --user-data-dir="${PWD}/user_data" \
-    "https://myapps.microsoft.com" 2>/dev/null &
+browser=
+BROWSERS="Google Chrome
+Microsoft Edge"
 
-PID=$!
+while read -r b; do
+  if [[ -d "/Applications/${b}.app" ]]; then
+    browser="${b}"
+    break
+  fi
+done < <(echo "$BROWSERS")
+
+if [[ -z "${browser}" ]]; then
+  echo -e "Cannot find a browser from:\n${BROWSERS}." && exit 1
+fi
+
+args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
+open -a "${browser}" -F -n "http://myapps.microsoft.com" --args $args
+
+while true; do
+    PID=$(ps aux | grep "${browser}.*--user-data-dir=${PWD}/user_data$" | grep -v grep | awk '{print $2;}' || true)
+    if [[ ! -z "${PID}" ]]; then
+        break
+    fi
+    sleep 1
+done
 
 until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
 
-# kill this chrome
+# kill this browser
 kill $PID
 
 printf "\n"
