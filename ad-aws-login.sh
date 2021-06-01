@@ -144,6 +144,9 @@ function read_config() {
   PROFILE_NAME="$(argv profile "" "${@:-}")"
   [[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
   readonly PROFILE_NAME
+  if [[ -z "${PROFILE_NAME}" ]]; then
+    exit_error 1 "Profile name cannot be empty."
+  fi
 
   readonly PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
 
