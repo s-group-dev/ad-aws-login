@@ -90,9 +90,10 @@ function cleanup() {
 }
 
 function handle_browser() {
-  while read -r b; do
-    if [[ -d "/Applications/${b}.app" ]]; then
-      readonly USER_BROWSER="${b}"
+  local browser
+  while read -r browser; do
+    if [[ -d "/Applications/${browser}.app" ]]; then
+      readonly USER_BROWSER="${browser}"
       break
     fi
   done < <(echo "$BROWSERS")
