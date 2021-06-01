@@ -1,3 +1,13 @@
+# [0.2.0](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.13...v0.2.0) (2021-06-01)
+
+
+### Features
+
+* Respect AWS_CONFIG_FILE and AWS_CREDENTIAL_FILE envs ([f030e64](https://github.com/s-group-dev/ad-aws-login/commit/f030e649c9eed18a18a8d1616d89bfac715a2f10))
+* Support for multiple browsers: Chrome and Edge ([cdde46c](https://github.com/s-group-dev/ad-aws-login/commit/cdde46cc825e086b7be555a7eda6ae463ff0449a))
+
+
+
 ## [0.1.13](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.12...v0.1.13) (2021-02-18)
 
 
@@ -35,10 +45,6 @@
 
 
 ## [0.1.9](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.8...v0.1.9) (2021-02-15)
-
-
-
-## [0.1.8](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.7...v0.1.8) (2021-02-15)
 
 
 
