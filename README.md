@@ -113,7 +113,7 @@ role_arn=arn:aws:iam::123456789012:role/Developer
 **Note** Your account probably has some maximum session duration. Trying to
 use longer `--duration` will cause the script to get stuck.
 
-If you don't want script to modify your existing ~/.aws fikder, you can
+If you don't want script to modify your existing ~/.aws folder, you can
 configure your profile / credentials to an alternative location:
 ```
 export AWS_CONFIG_FILE="/somewhere/else/.aws-alt/config"
