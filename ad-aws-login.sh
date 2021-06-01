@@ -160,7 +160,7 @@ function read_config() {
 }
 
 function main() {
-  read app role < <(read_config)
+  read app role < <(read_config "$@")
   create_params "${app}" "${role}"
   handle_browser
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
@@ -175,4 +175,4 @@ if echo "$@" | grep -q -- '\(^\| \)--h\(elp\)\?\b'; then
   usage
 fi
 
-main
+main "$@"
