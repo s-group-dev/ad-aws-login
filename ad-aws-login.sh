@@ -26,7 +26,7 @@ function _selaws() {
   local _AWS_PROFILE
   test ! -f "${AWS_CONFIG_FILE}" && echo "File ${AWS_CONFIG_FILE} does not exist" && return 1
   # If user has fzf installed
-  if which fzf >/dev/null 2>&1; then
+  if hash fzf >/dev/null 2>&1; then
     _AWS_PROFILE=$(grep '\[profile' < "${AWS_CONFIG_FILE}" | sed 's/\[profile \(.*\)]/\1/' | fzf)
   else
     select _aws_profile in $(grep '\[profile' < "${AWS_CONFIG_FILE}" | sed 's/\[profile \(.*\)]/\1/'); do
