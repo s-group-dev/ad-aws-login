@@ -26,7 +26,7 @@ function _selaws() {
   local _AWS_PROFILE
   test ! -f "${AWS_CONFIG_FILE}" && echo "File ${AWS_CONFIG_FILE} does not exist" && return 1
   # If user has fzf installed
-  if which fzf >/dev/null 2>&1; then
+  if hash fzf &>/dev/null; then
     _AWS_PROFILE=$(grep '\[profile' < "${AWS_CONFIG_FILE}" | sed 's/\[profile \(.*\)]/\1/' | fzf)
   else
     select _aws_profile in $(grep '\[profile' < "${AWS_CONFIG_FILE}" | sed 's/\[profile \(.*\)]/\1/'); do
@@ -47,22 +47,9 @@ readonly DURATION_HOURS="$(argv duration 8 "${@:-}")"
 readonly BROWSERS="Google Chrome
 Microsoft Edge"
 
-PROFILE_NAME="$(argv profile "" "${@:-}")"
-[[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
-readonly PROFILE_NAME
-
-readonly PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
-
-APP_NAME="$(argv app "" "${@:-}")"
-[[ -z $APP_NAME ]] && APP_NAME=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
-readonly APP_NAME
-  
-ROLE_ARN="$(argv role-arn "" "${@:-}")"
-[[ -z $ROLE_ARN ]] && ROLE_ARN=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn=.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
-readonly ROLE_ARN
-
 # VARIABLES
 
+PROFILE_NAME=
 USER_BROWSER=
 
 # FUNCTIONS
@@ -78,8 +65,16 @@ Options:
                      to launch. Case-insensitive. Must be url encoded.
   --duration INTEGER How many hours the temporary credentials are valid.
   --role-arn TEXT    AWS IAM Role to assume with AD credentials.
+  -h, --help         Show this help message and exit.
 EOF
-  exit 128
+  exit 0
+}
+
+function exit_error() {
+  local error_code="$1"
+  shift
+  1>&2 echo -e "$@"
+  exit ${error_code}
 }
 
 function cleanup() {
@@ -90,16 +85,17 @@ function cleanup() {
 }
 
 function handle_browser() {
-  while read -r b; do
-    if [[ -d "/Applications/${b}.app" ]]; then
-      readonly USER_BROWSER="${b}"
+  local browser
+  while read -r browser; do
+    if [[ -d "/Applications/${browser}.app" ]]; then
+      readonly USER_BROWSER="${browser}"
       break
     fi
   done < <(echo "$BROWSERS")
   trap cleanup EXIT
   
   if [[ -z "${USER_BROWSER}" ]]; then
-    echo -e "Cannot find a browser from:\n${BROWSERS}." && exit 1
+    exit_error 1 "Cannot find a browser from:\n${BROWSERS}."
   fi
   
   args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
@@ -121,11 +117,13 @@ function handle_browser() {
 }
 
 function create_params() {
+  local app="$1"
+  local role="$2"
   echo "const parameters = {
   durationHours: ${DURATION_HOURS},
-  appName: \"${APP_NAME}\",
+  appName: \"${app}\",
   filename: \"$(basename "${TEMP_FILE}")\",
-  roleArn: \"${ROLE_ARN}\"
+  roleArn: \"${role}\"
   };" > "${PWD}/chrome_extension/parameters.js"
 }
 
@@ -142,8 +140,28 @@ function persist_credentials() {
   tail -1 "${AWS_CREDENTIALS_FILE}"
 }
 
+function read_config() {
+  PROFILE_NAME="$(argv profile "" "${@:-}")"
+  [[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
+  readonly PROFILE_NAME
+  if [[ -z "${PROFILE_NAME}" ]]; then
+    exit_error 1 "Profile name cannot be empty."
+  fi
+
+  readonly PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
+
+  app_name="$(argv app "" "${@:-}")"
+  [[ -z "${app_name}" ]] && app_name=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
+  
+  role_arn="$(argv role-arn "" "${@:-}")"
+  [[ -z "${role_arn}" ]] && role_arn=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn=.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
+
+  echo "${app_name} ${role_arn}"
+}
+
 function main() {
-  create_params
+  read app role < <(read_config "$@")
+  create_params "${app}" "${role}"
   handle_browser
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
   
@@ -153,4 +171,8 @@ function main() {
 
 # MAIN
 
-main
+if echo "$@" | grep -q -- '\(^\| \)--h\(elp\)\?\b'; then
+  usage
+fi
+
+main "$@"
