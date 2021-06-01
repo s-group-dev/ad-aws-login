@@ -82,6 +82,13 @@ EOF
   exit 128
 }
 
+function exit_error() {
+  local error_code="$1"
+  shift
+  1>&2 echo -e "$@"
+  exit ${error_code}
+}
+
 function cleanup() {
   (
     rm -f "${TEMP_FILE}" || true
@@ -100,7 +107,7 @@ function handle_browser() {
   trap cleanup EXIT
   
   if [[ -z "${USER_BROWSER}" ]]; then
-    echo -e "Cannot find a browser from:\n${BROWSERS}." && exit 1
+    exit_error 1 "Cannot find a browser from:\n${BROWSERS}."
   fi
   
   args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
