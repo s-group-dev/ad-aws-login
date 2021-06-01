@@ -171,7 +171,7 @@ function main() {
 
 # MAIN
 
-if echo $@ | grep -q -- '\(^\| \)--h\(elp\)\?\b'; then
+if echo "$@" | grep -q -- '\(^\| \)--h\(elp\)\?\b'; then
   usage
 fi
 
