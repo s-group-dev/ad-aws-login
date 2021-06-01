@@ -1,3 +1,18 @@
+# [0.3.0](https://github.com/s-group-dev/ad-aws-login/compare/v0.2.0...v0.3.0) (2021-06-01)
+
+
+### Bug Fixes
+
+* exit if profile name is not given ([512ab4b](https://github.com/s-group-dev/ad-aws-login/commit/512ab4b2e20fad90346749a3bdd1e562bb600154))
+* pass cmdline args to main function ([bef7288](https://github.com/s-group-dev/ad-aws-login/commit/bef7288f3705abf3749d923b407f4ab3cd58275e))
+
+
+### Features
+
+* display help and exit ([92a7fef](https://github.com/s-group-dev/ad-aws-login/commit/92a7fefa6ef61abf64e1bc6ffadf5c333cd9c950))
+
+
+
 # [0.2.0](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.13...v0.2.0) (2021-06-01)
 
 
@@ -41,10 +56,6 @@
 ### Bug Fixes
 
 * remove latest tag configuration ([6131122](https://github.com/s-group-dev/ad-aws-login/commit/61311225a3ec682e3dd328803d7d7591d86ccc27))
-
-
-
-## [0.1.9](https://github.com/s-group-dev/ad-aws-login/compare/v0.1.8...v0.1.9) (2021-02-15)
 
 
 
