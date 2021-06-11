@@ -49,7 +49,6 @@ Microsoft Edge"
 
 # VARIABLES
 
-PROFILE_NAME=
 USER_BROWSER=
 
 # FUNCTIONS
@@ -128,27 +127,27 @@ function create_params() {
 }
 
 function persist_credentials() {
+  local profile_name="$1"
   if [[ ! -f "${AWS_CREDENTIALS_FILE}" ]]; then
     touch "${AWS_CREDENTIALS_FILE}"
   fi
 
   cp "${AWS_CREDENTIALS_FILE}" "${AWS_CREDENTIALS_FILE}.bak"
-  awk '/^\[/{keep=1} /^\['"${PROFILE_NAME}"'\]/{keep=0} {if (keep) {print $0}}' "${AWS_CREDENTIALS_FILE}.bak" > "${AWS_CREDENTIALS_FILE}"
-  printf "\n[%s]\n" "${PROFILE_NAME}" >> "${AWS_CREDENTIALS_FILE}"
+  awk '/^\[/{keep=1} /^\['"${profile_name}"'\]/{keep=0} {if (keep) {print $0}}' "${AWS_CREDENTIALS_FILE}.bak" > "${AWS_CREDENTIALS_FILE}"
+  printf "\n[%s]\n" "${profile_name}" >> "${AWS_CREDENTIALS_FILE}"
   cat "${TEMP_FILE}" >> "${AWS_CREDENTIALS_FILE}"
-  echo "Updated profile ${PROFILE_NAME}."
+  echo "Updated profile ${profile_name}."
   tail -1 "${AWS_CREDENTIALS_FILE}"
 }
 
 function read_config() {
-  PROFILE_NAME="$(argv profile "" "${@:-}")"
-  [[ -z "${PROFILE_NAME}" ]] && PROFILE_NAME=$(_selaws)
-  readonly PROFILE_NAME
-  if [[ -z "${PROFILE_NAME}" ]]; then
+  local profile_name="$(argv profile "" "${@:-}")"
+  [[ -z "${profile_name}" ]] && profile_name=$(_selaws)
+  if [[ -z "${profile_name}" ]]; then
     exit_error 1 "Profile name cannot be empty."
   fi
 
-  readonly PROFILE_CONFIG="$(sed -n "/${PROFILE_NAME}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
+  readonly PROFILE_CONFIG="$(sed -n "/${profile_name}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
 
   app_name="$(argv app "" "${@:-}")"
   [[ -z "${app_name}" ]] && app_name=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
@@ -156,17 +155,17 @@ function read_config() {
   role_arn="$(argv role-arn "" "${@:-}")"
   [[ -z "${role_arn}" ]] && role_arn=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn=.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 
-  echo "${app_name} ${role_arn}"
+  echo "${app_name} ${role_arn} ${profile_name}"
 }
 
 function main() {
-  read app role < <(read_config "$@")
-  create_params "${app}" "${role}"
+  read app_name role_arn profile_name < <(read_config "$@")
+  create_params "${app_name}" "${role_arn}"
   handle_browser
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
   
   printf "\n"
-  persist_credentials
+  persist_credentials "${profile_name}"
 }
 
 # MAIN
