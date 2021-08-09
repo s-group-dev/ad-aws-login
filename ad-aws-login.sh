@@ -149,17 +149,21 @@ function read_config() {
 
   readonly PROFILE_CONFIG="$(sed -n "/${profile_name}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
 
-  app_name="$(argv app "" "${@:-}")"
-  [[ -z "${app_name}" ]] && app_name=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
-  
   role_arn="$(argv role-arn "" "${@:-}")"
   [[ -z "${role_arn}" ]] && role_arn=$(echo "${PROFILE_CONFIG}" |  (grep 'role_arn=.*' || true) | sed -E 's/^.*role_arn *= *([^ ]*).*$/\1/')
 
-  echo "${app_name} ${role_arn} ${profile_name}"
+  echo "${role_arn} ${profile_name}"
+}
+
+function read_app_name() {
+  app_name="$(argv app "" "${@:-}")"
+  [[ -z "${app_name}" ]] && app_name=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
+  echo "${app_name}"
 }
 
 function main() {
-  read app_name role_arn profile_name < <(read_config "$@")
+  read app_name < <(read_app_name "$@")
+  read role_arn profile_name < <(read_config "$@")
   create_params "${app_name}" "${role_arn}"
   handle_browser
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
