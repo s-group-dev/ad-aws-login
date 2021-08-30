@@ -15,7 +15,8 @@
   "content_scripts": [
     {
       "matches": [
-        "https://login.microsoftonline.com/common/oauth2/authorize*"
+        "https://login.microsoftonline.com/common/oauth2/authorize*",
+        "https://login.microsoftonline.com/common/oauth2/v2.0/authorize*"
       ],
       "js": [
         "select_user.js"
@@ -23,7 +24,8 @@
     },
     {
       "matches": [
-        "https://myapplications.microsoft.com/*"
+        "https://myapplications.microsoft.com/*",
+        "https://myapps.microsoft.com/*"
       ],
       "js": [
         "parameters.js",
