@@ -92,15 +92,15 @@ function handle_browser() {
     fi
   done < <(echo "$BROWSERS")
   trap cleanup EXIT
-  
+
   if [[ -z "${USER_BROWSER}" ]]; then
     exit_error 1 "Cannot find a browser from:\n${BROWSERS}."
   fi
-  
+
   args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
   # shellcheck disable=SC2086
-  open -a "${USER_BROWSER}" -F -n "http://myapps.microsoft.com" --args ${args}
-  
+  open -a "${USER_BROWSER}" -F -n "https://myapps.microsoft.com" --args ${args}
+
   while true; do
     PID=$(pgrep -lf "${USER_BROWSER}\.app.*--user-data-dir=${PWD}/user_data$" | grep -v grep | awk '{print $1;}' || true)
     if [[ -n "${PID}" ]]; then
@@ -156,18 +156,21 @@ function read_config() {
 }
 
 function read_app_name() {
+  local profile_name="$1"
+  shift
+  readonly PROFILE_CONFIG="$(sed -n "/${profile_name}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
   app_name="$(argv app "" "${@:-}")"
   [[ -z "${app_name}" ]] && app_name=$(echo "${PROFILE_CONFIG}" | (grep 'app=.*' || true) | sed -E 's/^.*app *= *([^ ]*).*$/\1/')
-  echo "${app_name}"
+  echo "${app_name}" | sed 's|%20| |g'
 }
 
 function main() {
-  read app_name < <(read_app_name "$@")
   read role_arn profile_name < <(read_config "$@")
+  read app_name < <(read_app_name "${profile_name}" "$@")
   create_params "${app_name}" "${role_arn}"
   handle_browser
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
-  
+
   printf "\n"
   persist_credentials "${profile_name}"
 }
