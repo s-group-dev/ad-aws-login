@@ -44,12 +44,18 @@ readonly AWS_CONFIG_FILE="${AWS_CONFIG_FILE:-$HOME/.aws/config}"
 readonly AWS_CREDENTIALS_FILE="${AWS_SHARED_CREDENTIALS_FILE:-$HOME/.aws/credentials}"
 readonly TEMP_FILE="${HOME}/Downloads/temporary_aws_credentials$(date +"%Y-%m-%d_%H-%M-%S").txt"
 readonly DURATION_HOURS="$(argv duration 8 "${@:-}")"
-readonly BROWSERS="Google Chrome
-Microsoft Edge"
+
+readonly FIND_PATHS_OSX="/Applications"
+readonly FIND_PATHS_WIN="/c/Program Files/Google/Chrome/Application
+/c/Program Files (x86)/Google/Chrome/Application"
+
+readonly BROWSERS_OSX="Google Chrome.app
+Microsoft Edge.app"
+readonly BROWSERS_WIN="chrome.exe"
 
 # VARIABLES
 
-USER_BROWSER=
+BROWSER_PID=
 
 # FUNCTIONS
 
@@ -79,31 +85,76 @@ function exit_error() {
 function cleanup() {
   (
     rm -f "${TEMP_FILE}" || true
-    kill "$(pgrep -lf "${USER_BROWSER}.app" | grep "${USER_BROWSER}.*--user-data-dir=${PWD}/user_data$" | awk '{print $1;}')"
+    kill "$BROWSER_PID" || true
   ) &>/dev/null
 }
 
-function handle_browser() {
-  local browser
-  while read -r browser; do
-    if [[ -d "/Applications/${browser}.app" ]]; then
-      readonly USER_BROWSER="${browser}"
-      break
-    fi
-  done < <(echo "$BROWSERS")
-  trap cleanup EXIT
+function read_os() {
+  case "$OSTYPE" in
+    solaris*) echo "SOLARIS";;
+    darwin*)  echo "OSX";; 
+    linux*)   echo "LINUX";;
+    bsd*)     echo "BSD";;
+    msys*)    echo "WIN";;
+    cygwin*)  echo "WIN";;
+  esac
+}
 
-  if [[ -z "${USER_BROWSER}" ]]; then
-    exit_error 1 "Cannot find a browser from:\n${BROWSERS}."
+function find_browser_path() {
+  local list_paths="$1"
+  local list_browsers="$2"
+  local path
+  local browser
+
+  while read -r path; do
+    while read -r browser; do
+      if [[ -f "${path}/${browser}" ]]; then
+        echo "${path}/${browser}"
+        break
+      fi
+    done < <(echo "$list_browsers")
+  done < <(echo "$list_paths")
+  trap cleanup EXIT
+}
+
+function find_browser() {
+  local os=$(read_os)
+  case "$os" in
+    OSX*) echo $(find_browser_path "${FIND_PATHS_OSX}" "${BROWSERS_OSX}");;
+    WIN*) echo $(find_browser_path "${FIND_PATHS_WIN}" "${BROWSERS_WIN}");;
+    *)    exit_error 2 "Unhandled OS: ${OSTYPE}";;
+  esac
+}
+
+function open_browser() {
+  local os=$(read_os)
+  local browser=$(find_browser)
+  local url="https://myapps.microsoft.com"
+
+  if [[ -z "${browser}" ]]; then
+    exit_error 1 "Cannot find a browser"
   fi
 
-  args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
   # shellcheck disable=SC2086
-  open -a "${USER_BROWSER}" -F -n "https://myapps.microsoft.com" --args ${args}
+  args="--load-extension="${PWD}/chrome_extension" --disable-extensions-except="${PWD}/chrome_extension" --user-data-dir="${PWD}/user_data""
 
+  case "$os" in
+    OSX*)  open "${browser}" -F -n ${url} --args ${args};;
+    WIN*)  "${browser}" -F -n ${url} --args ${args} &;;
+    *)     exit_error 2 "Unhandled OS: ${OSTYPE}";;
+  esac
+
+  local pid=$!
+  echo $pid
+}
+
+function handle_browser() {
+  BROWSER_PID=$(open_browser)
+  
   while true; do
-    PID=$(pgrep -lf "${USER_BROWSER}\.app.*--user-data-dir=${PWD}/user_data$" | grep -v grep | awk '{print $1;}' || true)
-    if [[ -n "${PID}" ]]; then
+    local process=$(ps -p $BROWSER_PID | grep $BROWSER_PID)
+    
+    if [ "$process" = "" ]; then
       break
     fi
     sleep 1
@@ -112,7 +163,7 @@ function handle_browser() {
   until [ -f "${TEMP_FILE}" ]; do (sleep 1 && printf "."); done
 
   # kill this browser
-  kill "${PID}"
+  kill "${BROWSER_PID}" &>/dev/null || true
 }
 
 function create_params() {
