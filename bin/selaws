@@ -15,6 +15,18 @@ function _selaws() {
     fi
 }
 
-export AWS_PROFILE="$(_selaws)"
+function region() {
+    local _aws_profile="$1"
+    readonly PROFILE_CONFIG="$(sed -n "/${_aws_profile}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
+    
+    local region=""
+    [[ -z "${region}" ]] && region=$(echo "${PROFILE_CONFIG}" |  (grep 'region=.*' || true) | sed -E 's/^.*region *= *([^ ]*).*$/\1/')
+    echo $region
+}
+
+aws_profile="$(_selaws)"
+export AWS_PROFILE="${aws_profile}"
+region=$(region "${aws_profile}")
+export AWS_DEFAULT_REGION="${region}"
 
 # vim: syntax=sh

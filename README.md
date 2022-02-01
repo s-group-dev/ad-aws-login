@@ -80,7 +80,7 @@ echo "export PATH=\"\${PATH}:$(pwd)/bin\"" >> ~/.bashrc
 By adding this to your path, you can run
 ```
 ad-aws-login  # to run the script
-. selaws      # to export AWS_PROFILE to your session
+. selaws      # to export AWS_PROFILE and AWS_DEFAULT_REGION to your session
 ```
 
 ## Example
