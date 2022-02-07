@@ -9,3 +9,4 @@ Based on the commit messages, increment the version from the latest release.
 - All other changes will increment the patch version.
 
 NOTE: message can be picked up either from commit or pull request message.
+NOTE: branch cannot be protected in GitHub.
