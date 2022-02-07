@@ -19,7 +19,8 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🚀️ Bump version and push tag"
-        uses: TriPSs/conventional-changelog-action@v3.7.1
+        uses: TriPSs/conventional-changelog-action@v3.10.0
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           tag-prefix: 'v'
+          release-count: 0
