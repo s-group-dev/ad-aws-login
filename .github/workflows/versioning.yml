@@ -2,7 +2,7 @@ name: Bump Version
 on:
   push:
     branches:
-      - master
+      - main
     paths-ignore:
       - 'package.json'
       - 'CHANGELOG.md'
