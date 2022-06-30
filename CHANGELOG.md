@@ -1,3 +1,12 @@
+## [0.4.1](https://github.com/s-group-dev/ad-aws-login/compare/v0.4.0...v0.4.1) (2022-06-30)
+
+
+### Bug Fixes
+
+* create dir if aws config/credetianls dir is missing ([755cf0a](https://github.com/s-group-dev/ad-aws-login/commit/755cf0a080a987c332ad1982e5eb2b7c64457e97))
+
+
+
 # [0.4.0](https://github.com/s-group-dev/ad-aws-login/compare/v0.2.0...v0.4.0) (2022-02-07)
 
 
