@@ -128,6 +128,9 @@ function create_params() {
 
 function persist_credentials() {
   local profile_name="$1"
+
+  AWS_CREDENTIALS_PATH="$(dirname "${AWS_CREDENTIALS_FILE}")"
+  mkdir -p "${AWS_CREDENTIALS_PATH}"
   if [[ ! -f "${AWS_CREDENTIALS_FILE}" ]]; then
     touch "${AWS_CREDENTIALS_FILE}"
   fi
@@ -165,6 +168,12 @@ function read_app_name() {
 }
 
 function main() {
+  AWS_CONFIG_PATH="$(dirname "${AWS_CONFIG_FILE}")"
+  mkdir -p "${AWS_CONFIG_PATH}"
+  if [[ ! -f "${AWS_CONFIG_FILE}" ]]; then
+    touch "${AWS_CONFIG_FILE}"
+  fi
+
   read role_arn profile_name < <(read_config "$@")
   read app_name < <(read_app_name "${profile_name}" "$@")
   create_params "${app_name}" "${role_arn}"
