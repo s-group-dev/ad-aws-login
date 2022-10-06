@@ -20,7 +20,7 @@ function region() {
     readonly PROFILE_CONFIG="$(sed -n "/${_aws_profile}/,/^ *$/p" "${AWS_CONFIG_FILE}")"
     
     local region=""
-    [[ -z "${region}" ]] && region=$(echo "${PROFILE_CONFIG}" |  (grep 'region=.*' || true) | sed -E 's/^.*region *= *([^ ]*).*$/\1/')
+    [[ -z "${region}" ]] && region=$(echo "${PROFILE_CONFIG}" |  (grep '\<region=.*\>' || true) | sed -E 's/^region *= *([^ ]*).*$/\1/')
     echo $region
 }
 
