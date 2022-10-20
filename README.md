@@ -104,10 +104,16 @@ You can also configure your profile in `.aws/config`. Do note that profiles shou
 [profile test-admin]
 region=eu-west-1
 app=AWS test
-role_arn=arn:aws:iam::123456789012:role/Developer
+ad_login_role_arn=arn:aws:iam::123456789012:role/Developer
 
 [profile another-profile]
 ...
+```
+
+**Note** Please rename your role arn name. It is reserved for aws_cli
+```
+  source_profile => remove source_profile
+  role_arn => ad_login_role_arn  
 ```
 
 **Note** Your account probably has some maximum session duration. Trying to
