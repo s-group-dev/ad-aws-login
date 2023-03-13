@@ -7,7 +7,7 @@
 
 # Azure AD Login to AWS
 
-The `ad-aws-login` script fetches temporary AWS credentials with Azude AD
+The `ad-aws-login` script fetches temporary AWS credentials with Azure AD
 login (https://myapps.microsoft.com).
 
 So far this has been used **only on OS X** and with **Google Chrome** and **Microsoft Edge**.
@@ -133,7 +133,12 @@ you must export AWS_CONFIG_FILE and AWS_SHARED_CREDENTIALS_FILE variables.
 
 ## Useful commands
 
-If you have [fzf](https://github.com/junegunn/fzf) installed, `aws-aws-login` will use it automatically for better experience.
+If you have [fzf](https://github.com/junegunn/fzf) installed, `ad-aws-login` will use it automatically for better experience.
+
+## Troubleshooting
+
+- [`myapps.microsoft.com`](myapps.microsoft.com) does not render, the screen is blank
+   - Delete the `user_data` folder in the root of `ad-aws-login` repository and try again
 
 ## More Resouces
 
