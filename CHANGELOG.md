@@ -1,3 +1,12 @@
+## [0.4.2](https://github.com/s-group-dev/ad-aws-login/compare/v0.4.1...v0.4.2) (2023-03-13)
+
+
+### Bug Fixes
+
+* update README with troubleshooting tips ([9200004](https://github.com/s-group-dev/ad-aws-login/commit/9200004a5bd7cd6ccba62fba80b0b326448ad4d7))
+
+
+
 ## [0.4.1](https://github.com/s-group-dev/ad-aws-login/compare/v0.4.0...v0.4.1) (2022-06-30)
 
 
